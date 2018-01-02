@@ -32,6 +32,8 @@ function initGauges() {
         if('thingspeak' === gauge_cfg[ix].data_source) {
             window.thingspk_loadData(ix);
             setInterval(window.thingspk_loadData, thingspk_cfg.interval, ix);
+        } else if('firebase' === gauge_cfg[ix].data_source) {
+            gauge_cfg[ix].enable(ix);
         }
     }
 };
