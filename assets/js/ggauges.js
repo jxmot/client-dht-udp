@@ -2,7 +2,7 @@
 google.load('visualization', '1', {packages:['gauge']});
 google.setOnLoadCallback(window.initGauges);
 
-// display the data
+// display the data directly to an indexed gauge
 function displayData(ix, point) {
     console.log('displayData() - ix = ' + ix + '  point = ' + point);
     if(ix >= 0 && ix < gauge_cfg.length) {
@@ -23,6 +23,8 @@ function initGauges() {
 
         gauge_cfg[ix].chart = new google.visualization.Gauge(document.getElementById(gauge_cfg[ix].target));
 
+        gauge_cfg[ix].data.setValue(0, 0, gauge_cfg[ix].name + ' ' + gauge_cfg[ix].type);
+
         // NOTE: This is done here as a placeholder for future expansion. Not 
         // all of the may use Thingspeak as their data source. In the future
         // (and likely a different project) may use Firebase as the data source
@@ -33,7 +35,8 @@ function initGauges() {
             window.thingspk_loadData(ix);
             setInterval(window.thingspk_loadData, thingspk_cfg.interval, ix);
         } else if('firebase' === gauge_cfg[ix].data_source) {
-            gauge_cfg[ix].enable(ix);
+            gauge_cfg[ix].enable();
+            window.firebase_initGauge(gauge_cfg[ix].data_channel);
         }
     }
 };
