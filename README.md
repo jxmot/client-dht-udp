@@ -108,9 +108,26 @@ var _enable = function() {
 };
 ```
 
+The preceding gauge configuration will display like this - 
 
+<p align="center">
+  <img src="./mdimg/gauge-example-1.png" alt="Gauge Example" txt="Gauge Example"/>
+</p>
+
+Each function instance requires access to members within its associated *gauge object*. This is accomplished with this portion of the code -
+
+```javascript
+    var _data = this.data;
+    var _chart = this.chart;
+    var _type = this.type;
+    var _name = this.name;
+    var _opt = this.opt;
+```
+
+Please note that the gauge *options* can be changed during run-time and the gauge's appearance will update on the subsequent data update - `_chart.draw(_data, _opt);`.
 
 ### Data Events
+
 
 
 #### Handling Incoming Data
