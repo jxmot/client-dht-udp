@@ -30,4 +30,87 @@ The *complete* SensorNet consists of -
   <img src="./mdimg/basic-flow-1.png" alt="SensorNet Overview" txt="SensorNet Overview"/>
 </p>
 
+## Design Details
 
+From this point on it is *assumed* that the reader has some experience with - 
+
+* HTML & CSS - just the basics.
+* JavaScript - specifically events, triggers, and handlers. And accessing the DOM.
+* Firebase - data retrieval.
+
+The following topics will be covered in this document - 
+
+* Gauge configuration & initialization.
+* Data events.
+
+### Gauge Configuration
+
+The displayed gauges are configured in an array of objects found in `assets/js/gauge-cfg.js`. The following aspects are configurable - 
+
+* Target HTML element - typically a `<div>` with an ID. The element's ID is considered to be the *target*.
+* Gauge Name/Label - A string that is shown on the gauge face.
+* Gauge Type - In this application the type can be either "**T**" (*temperature*) or "**H**" (*humidity*).
+* Gauge Unit - This can be either "**F**" (*Fahrenheit*) or "**%**" (*percent*). Please note that this setting will be implemented in a future version of this application.
+* Data Source - Typically this will be "**firebase**", however the code can also accept "**thingspeak**" if the data is routed through **[ThingSpeak](<https://thingspeak.com/>)**.
+* Data Channel - Each of the sensors (*ESP8266 devices*) have unique hostnames. For example - **ESP_49F542** where the last 6 characters represent the 3 right-most octets of the devices *MAC address*. 
+* Rounding of data values - This `bool` if set to `true` will enable rounding to an integer value. And the gauge will not display fractional values.
+* Google Gauge Options - This is where the appearance of the gauge is configured. The *range*, width & height, segment colors & ranges, and presence of *ticks* are configured here. See **[Google Charts Visualization: Gauge](<https://developers.google.com/chart/interactive/docs/gallery/gauge>)** for detailed information.
+
+In addition to gauge configuration settings each gauge in the array also contains a `chart` and `data` object that are representations of the Google Gauge. There is also a function within each gauge object in the array. This function aids in the handling of an event that is triggered for each gauge when new data arrives. The `eventType` is the `data_channel`. And allows for better distribution of incoming data to a specified gauge.
+
+Here is an example of a gauge configuration - 
+
+```javascript
+    {
+        target: 'gauge_div3',
+        name:'Den',
+        type: 'T',
+        unit: 'F',
+        data_source: 'firebase',
+        data_channel: 'ESP_49F542',
+        round: false,
+        opt: {
+            min: 25, max: 120, 
+            width: 180, height: 180,
+            yellowColor: 'blue',
+            yellowFrom:25, yellowTo: 55,
+            greenFrom: 55, greenTo: 80,
+            redFrom: 80, redTo: 120,
+            minorTicks: 5
+        },
+        chart: {},
+        data: {},
+        enable: _enable
+    }
+```
+
+This is the function used in each of the gauge objects - 
+
+```javascript
+var _enable = function() {
+    var _data = this.data;
+    var _chart = this.chart;
+    var _type = this.type;
+    var _name = this.name;
+    var _opt = this.opt;
+    // NOTE: data_channel is known as "hostname" in the data
+    $(document).on(this.data_channel, function(e, sdata) {
+        console.log(_name + '  ' + _type);
+        console.log('got data - ' + JSON.stringify(sdata));
+
+        var point = 0;
+        if(_type === 'T') {
+            point = sdata.t;
+        } else point = sdata.h;
+        _data.setValue(0, 1, point);
+        _chart.draw(_data, _opt);
+    });
+};
+```
+
+
+
+### Data Events
+
+
+#### Handling Incoming Data
