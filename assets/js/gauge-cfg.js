@@ -13,8 +13,6 @@ var _enable = function() {
         console.log(_name + '  ' + _type);
         console.log('got data - ' + JSON.stringify(sdata));
 
-        //_data.setValue(0, 0, _name + ' ' + _type);
-
         var point = 0;
         if(_type === 'T') {
             point = sdata.t;
