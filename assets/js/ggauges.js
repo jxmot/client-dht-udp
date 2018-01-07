@@ -2,7 +2,8 @@
 google.load('visualization', '1', {packages:['gauge']});
 google.setOnLoadCallback(window.initGauges);
 
-// display the data directly to an indexed gauge
+// display the data from ThingSpeak or a similar data souce
+// directly to an indexed gauge
 function displayData(ix, point) {
     console.log('displayData() - ix = ' + ix + '  point = ' + point);
     if(ix >= 0 && ix < gauge_cfg.length) {
