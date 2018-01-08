@@ -8,7 +8,7 @@ var _enable = function() {
     var _type = this.type;
     var _name = this.name;
     var _opt = this.opt;
-    // NOTE: data_channel is known as "hostname" in the data
+    // NOTE: data_channel is known as "dev_id" in the data
     $(document).on(this.data_channel, function(e, sdata) {
         console.log(_name + '  ' + _type);
         console.log('got data - ' + JSON.stringify(sdata));
