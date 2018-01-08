@@ -50,10 +50,10 @@ The displayed gauges are configured in an array of objects found in `assets/js/g
 * Target HTML element - typically a `<div>` with an ID. The element's ID is considered to be the *target*.
 * Gauge Name/Label - A string that is shown on the gauge face.
 * Gauge Type - In this application the type can be either "**T**" (*temperature*) or "**H**" (*humidity*).
-* Gauge Unit - This can be either "**F**" (*Fahrenheit*) or "**%**" (*percent*). Please note that this setting will be implemented in a future version of this application.
+* Gauge Unit - This can be either "**F**" (*Fahrenheit*) or "**%**" (*percent*). Please note that the display of  this setting will be implemented in a future version of this application.
 * Data Source - Typically this will be "**firebase**", however the code can also accept "**thingspeak**" if the data is routed through **[ThingSpeak](<https://thingspeak.com/>)**.
-* Data Channel - Each of the sensors (*ESP8266 devices*) have unique hostnames. For example - **ESP_49F542** where the last 6 characters represent the 3 right-most octets of the devices *MAC address*. 
-* Rounding of data values - This `bool` if set to `true` will enable rounding to an integer value. And the gauge will not display fractional values.
+* Data Channel - Each of the sensors (*ESP8266 devices*) have unique hostnames. For example - **ESP_49F542** where the last 6 characters represent the 3 right-most octets of the devices' *MAC address*. 
+* Rounding of data values - This `bool` if set to `true` will enable rounding to an integer value. And the gauge will not display any fractional values.
 * Google Gauge Options - This is where the appearance of the gauge is configured. The *range*, width & height, segment colors & ranges, and presence of *ticks* are configured here. See **[Google Charts Visualization: Gauge](<https://developers.google.com/chart/interactive/docs/gallery/gauge>)** for detailed information.
 
 In addition to gauge configuration settings each gauge in the array also contains a `chart` and `data` object that are representations of the Google Gauge. There is also a function within each gauge object in the array. This function aids in the handling of an event that is triggered for each gauge when new data arrives. The `eventType` is the `data_channel`. And allows for better distribution of incoming data to a specified gauge.
@@ -124,10 +124,75 @@ Each function instance requires access to members within its associated *gauge o
     var _opt = this.opt;
 ```
 
-Please note that the gauge *options* can be changed during run-time and the gauge's appearance will update on the subsequent data update - `_chart.draw(_data, _opt);`.
+Please note that the gauge *options* can be changed during run-time and the gauge's appearance will update on the subsequent data update - `_chart.draw(_data, _opt);`. 
+
+#### Gauge Initialization
+
+Each gauge in the array is initialized in sequence. This is done when `initGauges()` is called from within `assets/js/ggauges.js` when the gauge is loaded.
+
+```javascript
+// load the google gauge visualization - google API load 
+google.load('visualization', '1', {packages:['gauge']});
+google.setOnLoadCallback(initGauges);
+
+// initialize the guages...
+function initGauges() {
+    // initialize all gauges...
+    for(var ix = 0; ix < gauge_cfg.length; ix++)
+    {
+        gauge_cfg[ix].data = new google.visualization.DataTable();
+        gauge_cfg[ix].data.addColumn('string', 'Label');
+        gauge_cfg[ix].data.addColumn('number', 'Value');
+        gauge_cfg[ix].data.addRows(1);
+        // attach the gauge to its DOM target
+        gauge_cfg[ix].chart = new google.visualization.Gauge(document.getElementById(gauge_cfg[ix].target));
+        // set the gauge label, this will be the configured name plus its type
+        gauge_cfg[ix].data.setValue(0, 0, gauge_cfg[ix].name + ' ' + gauge_cfg[ix].type);
+        // choose the appropriate initialization based on the data source 
+        // for the gauge
+        if('thingspeak' === gauge_cfg[ix].data_source) {
+            // This will start a repeating "read" of Thingspeak data, with an
+            // interval that's configured in _thingspk-cfg.js
+            thingspk_loadData(ix);
+            setInterval(thingspk_loadData, thingspk_cfg.interval, ix);
+        } else if('firebase' === gauge_cfg[ix].data_source) {
+            // This gauge uses Firebase. Enable the gauge to receive updates from
+            // the database as records are written to it.
+            gauge_cfg[ix].enable();
+            // The enable() function will read the last written record for only
+            // the most recent sensor. This will insure that each gauge is updated
+            // when it's created.
+            firebase_initGauge(gauge_cfg[ix].data_channel);
+        }
+    }
+};
+```
 
 ### Data Events
 
+*Data events* are triggered when a new record is added to the sensor data log. This is done by waiting for the `child_added` Firebase event. For example, in `assets/js/firebase.js` - 
+
+```javascript
+/*
+    Wait for new data to be written to the sensor data log
+*/
+gSensorData.orderByChild('tstamp').limitToLast(1).on('child_added', newSensorData);
+
+function newSensorData(snapShot) {
+    var data = JSON.parse(JSON.stringify(snapShot.val()));
+    $(document).trigger(data.hostname, data);
+};
+```
 
 
 #### Handling Incoming Data
+
+
+## Additional Design Considerations
+
+### Limiting Firebase Traffic
+
+
+## Future Development
+
+
