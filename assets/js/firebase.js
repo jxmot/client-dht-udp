@@ -8,9 +8,9 @@
 gSensorData.orderByChild('tstamp').limitToLast(1).on('child_added', newSensorData);
 
 function newSensorData(snapShot) {
-    console.log('data added!!!');
-    console.log(JSON.stringify(snapShot.val()));
-    console.log();
+    // mute console.log('data added!!!');
+    // mute console.log(JSON.stringify(snapShot.val()));
+    // mute console.log();
 
     var data = JSON.parse(JSON.stringify(snapShot.val()));
 
