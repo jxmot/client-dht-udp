@@ -14,7 +14,7 @@ function newSensorData(snapShot) {
 
     var data = JSON.parse(JSON.stringify(snapShot.val()));
 
-    $(document).trigger(data.hostname, data);
+    $(document).trigger(data.dev_id, data);
 };
 
 /*
@@ -24,7 +24,7 @@ gSensorStatus.orderByChild('tstamp').limitToLast(1).on('child_added', newSensorS
 
 function newSensorStatus(snapShot) {
     var status = JSON.parse(JSON.stringify(snapShot.val()));
-    $(document).trigger(status.hostname+'_status', status);
+    $(document).trigger(status.dev_id+'_status', status);
 };
 
 
@@ -39,16 +39,16 @@ function newSensorStatus(snapShot) {
 // function is called during gauge initialization it will be called
 // twice with the same `hostname`. This will aid in preventing a 
 // gauge from being updated twice.
-var lasthostname = '';
+var lastdev_id = '';
 
-function firebase_initGauge(hostname) {
+function firebase_initGauge(dev_id) {
 
-    if(lasthostname === hostname) return;
-    lasthostname = hostname;
+    if(lastdev_id === dev_id) return;
+    lastdev_id = dev_id;
 
-    gSensorData.orderByChild('hostname').equalTo(hostname).limitToLast(1).once('value', function(snapShot) {
+    gSensorData.orderByChild('dev_id').equalTo(dev_id).limitToLast(1).once('value', function(snapShot) {
         snapShot.forEach(function(data) {
-            $(document).trigger(data.val().hostname, data.val());
+            $(document).trigger(data.val().dev_id, data.val());
         });
     });
 };
