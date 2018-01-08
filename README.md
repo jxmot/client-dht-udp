@@ -52,7 +52,7 @@ The displayed gauges are configured in an array of objects found in `assets/js/g
 * Gauge Type - In this application the type can be either "**T**" (*temperature*) or "**H**" (*humidity*).
 * Gauge Unit - This can be either "**F**" (*Fahrenheit*) or "**%**" (*percent*). Please note that the display of  this setting will be implemented in a future version of this application.
 * Data Source - Typically this will be "**firebase**", however the code can also accept "**thingspeak**" if the data is routed through **[ThingSpeak](<https://thingspeak.com/>)**.
-* Data Channel - Each of the sensors (*ESP8266 devices*) have unique hostnames. For example - **ESP_49F542** where the last 6 characters represent the 3 right-most octets of the devices' *MAC address*. 
+* Data Channel - Each of the sensors (*ESP8266 devices*) have unique hostnames. For example - **ESP_49F542** where the last 6 characters represent the 3 right-most octets of the devices' *MAC address*. This will be passed in the data as `dev_id` (*device ID*).
 * Rounding of data values - This `bool` if set to `true` will enable rounding to an integer value. And the gauge will not display any fractional values.
 * Google Gauge Options - This is where the appearance of the gauge is configured. The *range*, width & height, segment colors & ranges, and presence of *ticks* are configured here. See **[Google Charts Visualization: Gauge](<https://developers.google.com/chart/interactive/docs/gallery/gauge>)** for detailed information.
 
@@ -93,7 +93,7 @@ var _enable = function() {
     var _type = this.type;
     var _name = this.name;
     var _opt = this.opt;
-    // NOTE: data_channel is known as "hostname" in the data
+    // NOTE: data_channel is known as "dev_id" in the data
     $(document).on(this.data_channel, function(e, sdata) {
         console.log(_name + '  ' + _type);
         console.log('got data - ' + JSON.stringify(sdata));
@@ -180,7 +180,7 @@ gSensorData.orderByChild('tstamp').limitToLast(1).on('child_added', newSensorDat
 
 function newSensorData(snapShot) {
     var data = JSON.parse(JSON.stringify(snapShot.val()));
-    $(document).trigger(data.hostname, data);
+    $(document).trigger(data.dev_id, data);
 };
 ```
 
