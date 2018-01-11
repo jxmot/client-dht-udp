@@ -184,7 +184,6 @@ function newSensorData(snapShot) {
 };
 ```
 
-
 #### Handling Incoming Data
 
 
@@ -192,7 +191,10 @@ function newSensorData(snapShot) {
 
 ### Limiting Firebase Traffic
 
+Please review the README in the **[node-dht-udp](<https://github.com/jxmot/node-dht-udp>)**  repository for important details.
 
 ## Future Development
 
+### Responsive Google Gauges
 
+By nature *Google Gauges* are **not** responsive. My plan is to use the JavaScript `onresize` event to accomplish this. My current gauge implementation writes the gauge options each time the data is updated. So it *should* be possible to alter the size of a guage on the fly as the window is resized. This would require that each gauge save its current data so that a resize will update the gauge without having to wait for a live data update.
