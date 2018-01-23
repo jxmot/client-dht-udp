@@ -73,7 +73,8 @@ var gauge_cfg = [
         name:'MBR',
         type: 'T',
         unit: 'F',
-        data_source: 'firebase',
+        //data_source: 'firebase',
+        data_source: 'socket',
         data_channel: 'ESP_49EB40',
         round: false,
         opt: {
@@ -95,7 +96,8 @@ var gauge_cfg = [
         name:'MBR',
         type: 'H',
         unit: '%',
-        data_source: 'firebase',
+        //data_source: 'firebase',
+        data_source: 'socket',
         data_channel: 'ESP_49EB40',
         round: false,
         opt: {
