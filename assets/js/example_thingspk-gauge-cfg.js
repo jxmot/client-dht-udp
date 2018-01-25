@@ -18,7 +18,8 @@ var tsgauge_cfg = [
             minorTicks: 5
         },
         chart: {},
-        data: {}
+        data: {},
+        enable: null
     },
     // 
     {
@@ -39,6 +40,7 @@ var tsgauge_cfg = [
             minorTicks: 5
         },
         chart: {},
-        data: {}
+        data: {},
+        enable: null
     }
 ];

@@ -1,22 +1,22 @@
 
-// this function is used by gauges the obtain their data
-// from a firebase (or similar) data source. But NOT
-// Thingspeak!
 var _enable = function() {
-    var _data = this.data;
+    // this is how we get access to the gauge's config data
+    var _data  = this.data;
     var _chart = this.chart;
-    var _type = this.type;
-    var _name = this.name;
-    var _opt = this.opt;
+    var _type  = this.type;
+    var _name  = this.name;
+    var _opt   = this.opt;
     // NOTE: data_channel is known as "dev_id" in the data
     $(document).on(this.data_channel, function(e, sdata) {
-        console.log(_name + '  ' + _type);
-        console.log('got data - ' + JSON.stringify(sdata));
+        consolelog(_name + '  ' + _type);
+        consolelog('got data - ' + JSON.stringify(sdata));
 
         var point = 0;
+
         if(_type === 'T') {
             point = sdata.t;
         } else point = sdata.h;
+
         _data.setValue(0, 1, point);
         _chart.draw(_data, _opt);
     });
@@ -26,11 +26,10 @@ var _enable = function() {
 var gauge_cfg = [
     // 
     {
-        target: 'gauge_div3',
+        target: 'gaugediv_1',
         name:'Den',
         type: 'T',
         unit: 'F',
-        data_source: 'firebase',
         data_channel: 'ESP_49F542',
         round: false,
         opt: {
@@ -48,11 +47,10 @@ var gauge_cfg = [
     },
     // 
     {
-        target: 'gauge_div4',
+        target: 'gaugediv_2',
         name:'Den',
         type: 'H',
         unit: '%',
-        data_source: 'firebase',
         data_channel: 'ESP_49F542',
         round: false,
         opt: {
@@ -69,11 +67,10 @@ var gauge_cfg = [
     },
     // 
     {
-        target: 'gauge_div5',
+        target: 'gaugediv_3',
         name:'MBR',
         type: 'T',
         unit: 'F',
-        data_source: 'firebase',
         data_channel: 'ESP_49EB40',
         round: false,
         opt: {
@@ -91,11 +88,10 @@ var gauge_cfg = [
     },
     // 
     {
-        target: 'gauge_div6',
+        target: 'gaugediv_4',
         name:'MBR',
         type: 'H',
         unit: '%',
-        data_source: 'firebase',
         data_channel: 'ESP_49EB40',
         round: false,
         opt: {
@@ -112,11 +108,10 @@ var gauge_cfg = [
     },
     // 
     {
-        target: 'gauge_div7',
+        target: 'gaugediv_5',
         name:'LR',
         type: 'T',
         unit: 'F',
-        data_source: 'firebase',
         data_channel: 'ESP_49ECCD',
         round: false,
         opt: {
@@ -134,11 +129,10 @@ var gauge_cfg = [
     },
     // 
     {
-        target: 'gauge_div8',
+        target: 'gaugediv_6',
         name:'LR',
         type: 'H',
         unit: '%',
-        data_source: 'firebase',
         data_channel: 'ESP_49ECCD',
         round: false,
         opt: {
@@ -155,11 +149,10 @@ var gauge_cfg = [
     },
     // 
     {
-        target: 'gauge_div9',
+        target: 'gaugediv_7',
         name:'Office',
         type: 'T',
         unit: 'F',
-        data_source: 'firebase',
         data_channel: 'ESP_49EC8B',
         round: false,
         opt: {
@@ -177,11 +170,10 @@ var gauge_cfg = [
     },
     // 
     {
-        target: 'gauge_div10',
+        target: 'gaugediv_8',
         name:'Office',
         type: 'H',
         unit: '%',
-        data_source: 'firebase',
         data_channel: 'ESP_49EC8B',
         round: false,
         opt: {
