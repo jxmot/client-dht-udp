@@ -18,7 +18,7 @@ function initGauges() {
         gauge_cfg[ix].enable();
     }
     // initialize sockets for incoming sensor status and data
-    initSocket();
+    $(document).trigger('app_ready', true);
 };
 
 
