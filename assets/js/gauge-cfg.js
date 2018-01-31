@@ -6,6 +6,8 @@ var _enable = function() {
     var _type  = this.type;
     var _name  = this.name;
     var _opt   = this.opt;
+    var _round = this.round;
+
     // NOTE: data_channel is known as "dev_id" in the data
     $(document).on(this.data_channel, function(e, sdata) {
         consolelog(_name + '  ' + _type);
@@ -16,6 +18,8 @@ var _enable = function() {
         if(_type === 'T') {
             point = sdata.t;
         } else point = sdata.h;
+
+        if(_round) point = Math.round(point);
 
         _data.setValue(0, 1, point);
         _chart.draw(_data, _opt);
