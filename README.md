@@ -1,3 +1,6 @@
+# NOTICE
+**This repository is undergoing a major overhaul. Please do not use it at this time. 2018-08-05**
+
 # client-dht-udp
 
 This is a web client to my **[node-dht-udp](<https://github.com/jxmot/node-dht-udp>)** server, and displays temperature and humidity using gauges.
