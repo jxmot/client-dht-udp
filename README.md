@@ -2,6 +2,16 @@
 
 This is a web client to my **[node-dht-udp](<https://github.com/jxmot/node-dht-udp>)** server, and displays temperature and humidity using gauges.
 
+**To Do:**
+
+1. remove firebase
+2. remove thingspeak
+3. add socketio
+4. add data path through node-dht-udp
+5. TBD
+6. 
+
+
 ## History
 
 This project was created as part of a larger project that I'll refer to as **_SensorNet_**. The first pass will provide a means to display temperature and humidity for one or more *sensors*. 
