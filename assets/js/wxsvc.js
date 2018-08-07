@@ -20,9 +20,15 @@ $(document).on('wxsvc_obsv', function(e, payload) {
     $('#wxsvc_t').text(wxdata.t);
     $('#wxsvc_h').text(wxdata.h);
 
-    // todo: check values, adjust all text as needed
+    // todo: check all values, adjust all text as needed
     $('#wxsvc_dew').text(wxdata.dew);
-    $('#wxsvc_hix').text(wxdata.hix);
+
+    if(wxdata.hix < 0) $('#wxsvc_hix_msg').addClass('hidden');
+    else {
+        $('#wxsvc_hix_msg').removeClass('hidden');
+        $('#wxsvc_hix').text(wxdata.wg);
+    }
+
 //  $('#wxsvc_wch').text(wxdata.wch);
 
     $('#wxsvc_ws').text(wxdata.ws);
