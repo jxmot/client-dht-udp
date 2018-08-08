@@ -10,8 +10,10 @@ function initSocket()
 {
     socket = io.connect(socketserver.host+':'+socketserver.port+'/');
 
-    socket.on('SERVER', function(data) {
-        consolelog('SERVER - '+JSON.stringify(data));
+    socket.on('server', function(data) {
+        consolelog('server - '+JSON.stringify(data));
+        // for future use, a placeholder for reacting
+        // to messages from the server itself
         if(data.status === true) socketready = true;
         else socketready = false;
     });
