@@ -1,4 +1,10 @@
+# NOTE: This document is "in progress". This heading will be removed when it is complete.
+
+
+
+
 # client-dht-udp
+
 
 This is a web client to my **[node-dht-udp](<https://github.com/jxmot/node-dht-udp>)** server, and displays temperature and humidity using gauges.
 
@@ -14,7 +20,7 @@ This is a web client to my **[node-dht-udp](<https://github.com/jxmot/node-dht-u
 
 ## History
 
-This project was created as part of a larger project that I'll refer to as **_SensorNet_**. The first pass will provide a means to display temperature and humidity for one or more *sensors*. 
+This project was created as part of a larger project that I'll refer to as **_SensorNet_**. 
 
 During the initial development I investigated a number of gauge type displays. My requirements for a gauge included - 
 
@@ -24,17 +30,19 @@ During the initial development I investigated a number of gauge type displays. M
 * The integration must be straight forward and not cumbersome.
 * Must be *responsive*. The gauge(s) must resize as necessary as the browser's viewport size is changed.
 
-After investigating a number of options I decided that *Google Gauges* would be the best choice *at this time*. The other I tried were cumbersome and bug-ridden. In addition their documentation was also lacking. However I will continue to research other options.
-
-The only requirement that isn't met with *Google Gauges* is responsiveness. However I believe that I can implement a method to achieve this.
+After investigating a number of options I decided that *<a href="https://c3js.org/" target="_blank">C3.js v0.4.18</a>*  would be the best choice. The others I tried were cumbersome and bug-ridden. In addition their documentation was also lacking. However I will continue to research additional options.
 
 ## Overview
 
-The *complete* SensorNet consists of - 
+<p align="center">
+  <img src="./mdimg/sensornet-sshot1-1060x700.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
+</p>
+
+The *complete* SensorNet system currently consists of - 
 
 * Temperature & Humidity Sensors - Each sensor consists of a DHT22 device and an ESP-01S.
-* Database Gateway - A NodeJS *server* that listens for sensor data and forwards the data to a database. In the current implementation the database used is *Firebase*.
-* Web Client - A browser based client that monitors the database for new data and displays it to the user.
+* Database Gateway - A NodeJS *server* that listens for sensor data and forwards the data to a database. In the current implementation the database used is *MySQL*. The server uses <a href="https://socket.io/" target="_blank">Socket.io</a> to "push" data updates to all connected web clients.
+* Web Client - A browser based client that waits for status and data updates from the server and displays it to the user. It utilizes HTML/CSS, Bootstrap, JavaScript/JQuery, JSON, and Socket.io.
 
 <p align="center">
   <img src="./mdimg/basic-flow-1.png" alt="SensorNet Overview" txt="SensorNet Overview"/>
@@ -46,12 +54,13 @@ From this point on it is *assumed* that the reader has some experience with -
 
 * HTML & CSS - just the basics.
 * JavaScript - specifically events, triggers, and handlers. And accessing the DOM.
-* Firebase - data retrieval.
+* Socket.io - basic connections
+* JSON - 
 
 The following topics will be covered in this document - 
 
 * Gauge configuration & initialization.
-* Data events.
+* Data events, sensors and weather data.
 
 ### Gauge Configuration
 
@@ -71,6 +80,26 @@ In addition to gauge configuration settings each gauge in the array also contain
 Here is an example of a gauge configuration - 
 
 ```javascript
+
+    {
+        target: 'gaugediv_2',
+        name: 'Den',
+        type: h_gauge.type,
+        unit: h_gauge.unit,
+        label: 'gaugelab_2',
+        device: 'gauge_device_1',
+        info: 'gauge_update_1',
+        status: 'gauge_status_1',
+        round: false,
+        data_channel: 'ESP_49F542',
+        opt: _c3_humi_gauge.opt,
+        chart: {},
+        data: {},
+        enable: _c3_enable
+    },
+
+
+
     {
         target: 'gauge_div3',
         name:'Den',
