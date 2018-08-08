@@ -1,24 +1,8 @@
-# NOTE: This document is "in progress". This heading will be removed when it is complete.
-
-
-
-
 # client-dht-udp
-
 
 This is a web client to my **[node-dht-udp](<https://github.com/jxmot/node-dht-udp>)** server, and displays temperature and humidity using gauges.
 
-**To Do:**
-
-1. remove firebase
-2. remove thingspeak
-3. add socketio
-4. add data path through node-dht-udp
-5. TBD
-6. 
-
-
-## History
+# History
 
 This project was created as part of a larger project that I'll refer to as **_SensorNet_**. 
 
@@ -32,7 +16,7 @@ During the initial development I investigated a number of gauge type displays. M
 
 After investigating a number of options I decided that *<a href="https://c3js.org/" target="_blank">C3.js v0.4.18</a>*  would be the best choice. The others I tried were cumbersome and bug-ridden. In addition their documentation was also lacking. However I will continue to research additional options.
 
-## Overview
+# Overview
 
 <p align="center">
   <img src="./mdimg/sensornet-sshot1-1060x700.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
@@ -44,196 +28,21 @@ The *complete* SensorNet system currently consists of -
 * Database Gateway - A NodeJS *server* that listens for sensor data and forwards the data to a database. In the current implementation the database used is *MySQL*. The server uses <a href="https://socket.io/" target="_blank">Socket.io</a> to "push" data updates to all connected web clients.
 * Web Client - A browser based client that waits for status and data updates from the server and displays it to the user. It utilizes HTML/CSS, Bootstrap, JavaScript/JQuery, JSON, and Socket.io.
 
+Here is a high level diagram of the SensorNet system :
+
 <p align="center">
   <img src="./mdimg/basic-flow-1.png" alt="SensorNet Overview" txt="SensorNet Overview"/>
 </p>
 
-## Design Details
+# Design Details
 
-From this point on it is *assumed* that the reader has some experience with - 
+## Connecting to the SensorNet Server
 
-* HTML & CSS - just the basics.
-* JavaScript - specifically events, triggers, and handlers. And accessing the DOM.
-* Socket.io - basic connections
-* JSON - 
+## Sensor Status and Data Reception
 
-The following topics will be covered in this document - 
+## Status and Sensor Data Display
 
-* Gauge configuration & initialization.
-* Data events, sensors and weather data.
+## Gauge Configuration
 
-### Gauge Configuration
+## Weather Data
 
-The displayed gauges are configured in an array of objects found in `assets/js/gauge-cfg.js`. The following aspects are configurable - 
-
-* Target HTML element - typically a `<div>` with an ID. The element's ID is considered to be the *target*.
-* Gauge Name/Label - A string that is shown on the gauge face.
-* Gauge Type - In this application the type can be either "**T**" (*temperature*) or "**H**" (*humidity*).
-* Gauge Unit - This can be either "**F**" (*Fahrenheit*) or "**%**" (*percent*). Please note that the display of  this setting will be implemented in a future version of this application.
-* Data Source - Typically this will be "**firebase**", however the code can also accept "**thingspeak**" if the data is routed through **[ThingSpeak](<https://thingspeak.com/>)**.
-* Data Channel - Each of the sensors (*ESP8266 devices*) have unique hostnames. For example - **ESP_49F542** where the last 6 characters represent the 3 right-most octets of the devices' *MAC address*. This will be passed in the data as `dev_id` (*device ID*).
-* Rounding of data values - This `bool` if set to `true` will enable rounding to an integer value. And the gauge will not display any fractional values.
-* Google Gauge Options - This is where the appearance of the gauge is configured. The *range*, width & height, segment colors & ranges, and presence of *ticks* are configured here. See **[Google Charts Visualization: Gauge](<https://developers.google.com/chart/interactive/docs/gallery/gauge>)** for detailed information.
-
-In addition to gauge configuration settings each gauge in the array also contains a `chart` and `data` object that are representations of the Google Gauge. There is also a function within each gauge object in the array. This function aids in the handling of an event that is triggered for each gauge when new data arrives. The `eventType` is the `data_channel`. And allows for better distribution of incoming data to a specified gauge.
-
-Here is an example of a gauge configuration - 
-
-```javascript
-
-    {
-        target: 'gaugediv_2',
-        name: 'Den',
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-        label: 'gaugelab_2',
-        device: 'gauge_device_1',
-        info: 'gauge_update_1',
-        status: 'gauge_status_1',
-        round: false,
-        data_channel: 'ESP_49F542',
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-
-
-
-    {
-        target: 'gauge_div3',
-        name:'Den',
-        type: 'T',
-        unit: 'F',
-        data_source: 'firebase',
-        data_channel: 'ESP_49F542',
-        round: false,
-        opt: {
-            min: 25, max: 120, 
-            width: 180, height: 180,
-            yellowColor: 'blue',
-            yellowFrom:25, yellowTo: 55,
-            greenFrom: 55, greenTo: 80,
-            redFrom: 80, redTo: 120,
-            minorTicks: 5
-        },
-        chart: {},
-        data: {},
-        enable: _enable
-    }
-```
-
-This is the function used in each of the gauge objects - 
-
-```javascript
-var _enable = function() {
-    var _data = this.data;
-    var _chart = this.chart;
-    var _type = this.type;
-    var _name = this.name;
-    var _opt = this.opt;
-    // NOTE: data_channel is known as "dev_id" in the data
-    $(document).on(this.data_channel, function(e, sdata) {
-        console.log(_name + '  ' + _type);
-        console.log('got data - ' + JSON.stringify(sdata));
-
-        var point = 0;
-        if(_type === 'T') {
-            point = sdata.t;
-        } else point = sdata.h;
-        _data.setValue(0, 1, point);
-        _chart.draw(_data, _opt);
-    });
-};
-```
-
-The preceding gauge configuration will display like this - 
-
-<p align="center">
-  <img src="./mdimg/gauge-example-1.png" alt="Gauge Example" txt="Gauge Example"/>
-</p>
-
-Each function instance requires access to members within its associated *gauge object*. This is accomplished with this portion of the code -
-
-```javascript
-    var _data = this.data;
-    var _chart = this.chart;
-    var _type = this.type;
-    var _name = this.name;
-    var _opt = this.opt;
-```
-
-Please note that the gauge *options* can be changed during run-time and the gauge's appearance will update on the subsequent data update - `_chart.draw(_data, _opt);`. 
-
-#### Gauge Initialization
-
-Each gauge in the array is initialized in sequence. This is done when `initGauges()` is called from within `assets/js/ggauges.js` when the gauge is loaded.
-
-```javascript
-// load the google gauge visualization - google API load 
-google.load('visualization', '1', {packages:['gauge']});
-google.setOnLoadCallback(initGauges);
-
-// initialize the guages...
-function initGauges() {
-    // initialize all gauges...
-    for(var ix = 0; ix < gauge_cfg.length; ix++)
-    {
-        gauge_cfg[ix].data = new google.visualization.DataTable();
-        gauge_cfg[ix].data.addColumn('string', 'Label');
-        gauge_cfg[ix].data.addColumn('number', 'Value');
-        gauge_cfg[ix].data.addRows(1);
-        // attach the gauge to its DOM target
-        gauge_cfg[ix].chart = new google.visualization.Gauge(document.getElementById(gauge_cfg[ix].target));
-        // set the gauge label, this will be the configured name plus its type
-        gauge_cfg[ix].data.setValue(0, 0, gauge_cfg[ix].name + ' ' + gauge_cfg[ix].type);
-        // choose the appropriate initialization based on the data source 
-        // for the gauge
-        if('thingspeak' === gauge_cfg[ix].data_source) {
-            // This will start a repeating "read" of Thingspeak data, with an
-            // interval that's configured in _thingspk-cfg.js
-            thingspk_loadData(ix);
-            setInterval(thingspk_loadData, thingspk_cfg.interval, ix);
-        } else if('firebase' === gauge_cfg[ix].data_source) {
-            // This gauge uses Firebase. Enable the gauge to receive updates from
-            // the database as records are written to it.
-            gauge_cfg[ix].enable();
-            // The enable() function will read the last written record for only
-            // the most recent sensor. This will insure that each gauge is updated
-            // when it's created.
-            firebase_initGauge(gauge_cfg[ix].data_channel);
-        }
-    }
-};
-```
-
-### Data Events
-
-*Data events* are triggered when a new record is added to the sensor data log. This is done by waiting for the `child_added` Firebase event. For example, in `assets/js/firebase.js` - 
-
-```javascript
-/*
-    Wait for new data to be written to the sensor data log
-*/
-gSensorData.orderByChild('tstamp').limitToLast(1).on('child_added', newSensorData);
-
-function newSensorData(snapShot) {
-    var data = JSON.parse(JSON.stringify(snapShot.val()));
-    $(document).trigger(data.dev_id, data);
-};
-```
-
-#### Handling Incoming Data
-
-
-## Additional Design Considerations
-
-### Limiting Firebase Traffic
-
-Please review the README in the **[node-dht-udp](<https://github.com/jxmot/node-dht-udp>)**  repository for important details.
-
-## Future Development
-
-### Responsive Google Gauges
-
-By nature *Google Gauges* are **not** responsive. My plan is to use the JavaScript `onresize` event to accomplish this. My current gauge implementation writes the gauge options each time the data is updated. So it *should* be possible to alter the size of a guage on the fly as the window is resized. This would require that each gauge save its current data so that a resize will update the gauge without having to wait for a live data update.
