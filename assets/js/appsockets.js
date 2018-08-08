@@ -21,6 +21,10 @@ function initSocket()
     socket.on('purge', showPurge);
     socket.on('wxobsv', showWXObsv);
     socket.on('wxfcst', showWXFcast);
+
+    socket.on('disconnect', function(){ 
+        consolelog('ERROR - socket is disconnected');
+    });
 };
 
 function showStatus(data) {

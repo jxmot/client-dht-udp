@@ -26,7 +26,7 @@ $(document).on('wxsvc_obsv', function(e, payload) {
     if(wxdata.hix < 0) $('#wxsvc_hix_msg').addClass('hidden');
     else {
         $('#wxsvc_hix_msg').removeClass('hidden');
-        $('#wxsvc_hix').text(wxdata.wg);
+        $('#wxsvc_hix').text(wxdata.hix);
     }
 
 //  $('#wxsvc_wch').text(wxdata.wch);
