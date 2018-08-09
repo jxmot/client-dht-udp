@@ -25,6 +25,7 @@ function initSocket()
     socket.on('wxfcst', showWXFcast);
 
     socket.on('disconnect', function(){ 
+        socketready = false;
         consolelog('ERROR - socket is disconnected');
     });
 };
