@@ -90,7 +90,7 @@ function initSocket()
 
 The client must connect to a *known* Socket.io server. For convenience, the server's IP address and port number are configurable. An example can be found in `example_socketcfg.js`.
 
-```json
+```
 var socketserver = {
     host: 'your-socketio-host',
     port: 3000,
