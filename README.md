@@ -18,10 +18,6 @@ After investigating a number of options I decided that *<a href="https://c3js.or
 
 # Overview
 
-<p align="center">
-  <img src="./mdimg/sensornet-sshot1-1060x700.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
-</p>
-
 The *complete* SensorNet system currently consists of - 
 
 * Temperature & Humidity Sensors - Each sensor consists of a DHT22 device and an ESP-01S.
@@ -34,15 +30,114 @@ Here is a high level diagram of the SensorNet system :
   <img src="./mdimg/basic-flow-1.png" alt="SensorNet Overview" txt="SensorNet Overview"/>
 </p>
 
+## Page Layout
+
+<p align="center">
+  <img src="./mdimg/sensornet-sshot1-1060x700.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
+</p>
+
+The page consists of four sensor *panels*, and three *collapsible panels*. It is responsive and viewable even on smaller mobile screens.
+
 # Design Details
+
+The SensorNet client function is to render sensor status and data for display on the browser. It does not interact with the SensorNet server except to establish a connection. After that it only receives sensor status and data.
+
+The other components of the SensorNet system are here : 
+
+* [esp8266-dht-udp](https://github.com/jxmot/esp8266-dht-udp) : Sensors
+* [node-dht-udp](https://github.com/jxmot/node-dht-udp) : SensorNet Server
 
 ## Connecting to the SensorNet Server
 
-## Sensor Status and Data Reception
+Connecting to a Socket.io server is easy. The only *catch* is the client has to wait until all of the gauges have finished initializing. If it didn't wait status & data messages would be lost and not displayed. The gauge initialization code will emit a `gauges_ready` event after it has finished.
+
+```javascript
+$(document).on('gauges_ready', function() {
+    // initialize sockets for incoming sensor status and data
+    initSocket();
+});
+
+function initSocket()
+{
+    // connect to the server...
+    socket = io.connect(socketserver.host+':'+socketserver.port+'/');
+
+    // let us know when the server sees our connection and sends
+    // us a confirmation...
+    socket.on('server', function(data) {
+        consolelog('server - '+JSON.stringify(data));
+        // for future use, a placeholder for reacting
+        // to messages from the server itself
+        if(data.status === true) socketready = true;
+        else socketready = false;
+    });
+
+    // listen for specific messages...
+    socket.on('status', showStatus);
+    socket.on('data', showData);
+    socket.on('purge', showPurge);
+    socket.on('wxobsv', showWXObsv);
+    socket.on('wxfcst', showWXFcast);
+
+    socket.on('disconnect', function(){ 
+        socketready = false;
+        consolelog('ERROR - socket is disconnected');
+    });
+};
+```
+
+### Configuration
+
+The client must connect to a *known* Socket.io server. For convenience, the server's IP address and port number are configurable. An example can be found in `example_socketcfg.js`.
+
+```json
+var socketserver = {
+    host: 'your-socketio-host',
+    port: 3000,
+};
+```
+
+Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match your server and save it. 
+
+## Status and Data Reception
+
+
+
+```javascript
+    // listen for specific messages...
+    socket.on('status', showStatus);
+    socket.on('data', showData);
+    socket.on('purge', showPurge);
+    socket.on('wxobsv', showWXObsv);
+    socket.on('wxfcst', showWXFcast);
+```
+
+### Routing The Messages
 
 ## Status and Sensor Data Display
 
 ## Gauge Configuration
 
+## System Status
+
+At this time the only system status that the client will display is the *data purge status*. It is an indication of the number of old sensor status and data records that were deleted in a data purge. Please see [node-dht-udp](https://github.com/jxmot/node-dht-udp) for additional details.
+
+<p align="center">
+  <img src="./mdimg/sensornet-sshot3B-1060x400.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
+</p>
+
+
 ## Weather Data
 
+The SensorNet client does not obtain the weather data from its source. That task belongs to the SensorNet server, along with storing it until requested by a web client. It will also periodically request new data from the weather data provider. And when new data has been collected the SensorNet server will broadcast the data to all connected clients.
+
+<p align="center">
+  <img src="./mdimg/sensornet-sshot2-530x450.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
+</p>
+
+Please see [node-dht-udp](https://github.com/jxmot/node-dht-udp) for additional details.
+
+<hr>
+<br>
+<p style="text-align:center">(c) 2018 Jim Motyl - https://github.com/jxmot/</p>
+<br>
