@@ -1,0 +1,37 @@
+
+.wxsvc-center {
+    text-align: center;
+}
+
+.wxsvc-svc {
+    font-size: .75em;
+}
+
+.wxsvc-table-cell-center {
+    text-align:center!important;
+}
+
+.wxsvc-table-cell-vert {
+    vertical-align:top!important;
+}
+
+.wxsvc-table-cell-width {
+    width: 33.33%!important;
+}
+
+table {
+  border-collapse: collapse;
+  border-style: hidden;
+    width: 100%!important;
+}
+
+table td {
+  border: 2px solid white;
+}
+
+.text {
+    text-align: left;
+    padding-top: 2.5%;
+    padding-left: 2.5%;
+    padding-right: 2.5%;
+}

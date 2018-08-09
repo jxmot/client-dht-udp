@@ -1,85 +1,427 @@
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
 <head>
-    <meta charset="UTF-8">
-    <title>Environmental Gauges Demonstration</title>
+    <!-- (c) 2017 Jim Motyl - https://github.com/jxmot/ -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SensorNet</title>
 
-    <!-- bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <!-- CSS for this file -->
+    <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
+
+<!-- CSS -->
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cyborg/bootstrap.min.css">
+    <!-- Site-wide CSS -->
+    <link rel="stylesheet" href="./assets/css/site.css">
+    <!-- Project CSS -->
+    <!-- Featured Project - SensorNet -->
+        <!-- CSS specifically for this file -->
+            <!-- using C3 gauges -->
+    <link rel="stylesheet" href="assets/css/c3-0.4.18/c3.css">
+            <!-- HTML Styling -->
+    <link rel="stylesheet" href="assets/css/sensornet.css">
+            <!-- Styling for the gauges -->
     <link rel="stylesheet" href="assets/css/multi-gauge.css"/>
-
+            <!-- Styling for the weather service data -->
+    <link rel="stylesheet" href="assets/css/wxsvc.css"/>
+        <!-- ^CSS specifically for this file -->
+    <!-- ^Featured Project - SensorNet -->
+    <!-- ^Project CSS -->
+<!-- ^CSS -->
+<!-- JS -->
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" crossorigin="anonymous"></script>
-    <!-- for sensor data via socket.io -->
+    <!-- ^jquery -->
+<!-- ^JS -->
+</head>
+<body id="pagetop" class="page-nocopy">
+    <!-- Featured Project - SensorNet -->
+    <div id="sensornet_project">
+        <div class="sensornet-outer">
+            <!-- SensorNet Gauge Panels -->
+            <div class="row sensornet-inner">
+                <!-- gauge panel -->
+                <div class="col-lg-2 col-lg-offset-2 col-md-3 col-sm-6 col-xs-12">
+                    <div id="sensor-panel-1" class="panel panel-success">
+                        <div class="panel-heading">
+                            <h3 id="sensor-panel-title-1" class="panel-title sensor-panel-title">Den</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                                    <div id="gaugediv_1" class="gauge_inner"></div>
+                                    <div id="gaugelab_1" class="gauge_label"></div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                                    <div id="gaugediv_2" class="gauge_inner"></div>
+                                    <div id="gaugelab_2" class="gauge_label"></div>
+                                </div>
+                            </div>
+                            <br>
+                            <header><h6>Device :</h6> <span id="gauge_device_1"></span></header>
+                            <header><h6>Update :</h6> <span id="gauge_update_1"></span></header>
+                            <header><h6>Status :</h6> <span id="gauge_status_1"></span></header>
+                        </div>
+                    </div>
+                </div>
+                <!-- /gauge panel -->
+                <!-- gauge panel -->
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div id="sensor-panel-2" class="panel panel-success">
+                        <div class="panel-heading">
+                            <h3 id="sensor-panel-title-2" class="panel-title sensor-panel-title">Master Bedroom</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                                    <div id="gaugediv_3" class="gauge_inner"></div>
+                                    <div id="gaugelab_3" class="gauge_label"></div>
+                                </div>
+                                <div class="col-md-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                                    <div id="gaugediv_4" class="gauge_inner"></div>
+                                    <div id="gaugelab_4" class="gauge_label"></div>
+                                </div>
+                            </div>
+                            <br>
+                            <header><h6>Device :</h6> <span id="gauge_device_2"></span></header>
+                            <header><h6>Update :</h6> <span id="gauge_update_2"></span></header>
+                            <header><h6>Status :</h6> <span id="gauge_status_2"></span></header>
+                        </div>
+                    </div>
+                </div>
+                <!-- /gauge panel -->
+                <!-- gauge panel -->
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div id="sensor-panel-3" class="panel panel-success">
+                        <div class="panel-heading">
+                            <h3 id="sensor-panel-title-3" class="panel-title sensor-panel-title">Living Room</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                                    <div id="gaugediv_5" class="gauge_inner"></div>
+                                    <div id="gaugelab_5" class="gauge_label"></div>
+                                </div>
+                                <div class="col-md-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                                    <div id="gaugediv_6" class="gauge_inner"></div>
+                                    <div id="gaugelab_6" class="gauge_label"></div>
+                                </div>
+                            </div>
+                            <br>
+                            <header><h6>Device :</h6> <span id="gauge_device_3"></span></header>
+                            <header><h6>Update :</h6> <span id="gauge_update_3"></span></header>
+                            <header><h6>Status :</h6> <span id="gauge_status_3"></span></header>
+                        </div>
+                    </div>
+                </div>
+                <!-- /gauge panel -->
+                <!-- gauge panel -->
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div id="sensor-panel-4" class="panel panel-success">
+                        <div class="panel-heading">
+                            <h3 id="sensor-panel-title-4" class="panel-title sensor-panel-title">Office</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                                    <div id="gaugediv_7" class="gauge_inner"></div>
+                                    <div id="gaugelab_7" class="gauge_label"></div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                                    <div id="gaugediv_8" class="gauge_inner"></div>
+                                    <div id="gaugelab_8" class="gauge_label"></div>
+                                </div>
+                            </div>
+                            <br>
+                            <header><h6>Device :</h6> <span id="gauge_device_4"></span></header>
+                            <header><h6>Update :</h6> <span id="gauge_update_4"></span></header>
+                            <header><h6>Status :</h6> <span id="gauge_status_4"></span></header>
+                        </div>
+                    </div>
+                </div>
+                <!-- /gauge panel -->
+            </div>
+            <!-- ^SensorNet Gauge Panels -->
+            <!-- SensorNet Local Weather -->
+            <div class="row sensornet-inner">
+                <!-- wx panel -->
+                <div class="col-lg-8 col-lg-offset-2 col-md-12 col-sm-12 col-xs-12">
+                    <div id="wx-panel" class="panel panel-success">
+                        <div class="panel-heading">
+                            <h3 class="panel-title sensor-panel-title sensornet-overview-title collapsed" data-toggle="collapse" data-target="#wx-collapse">
+                                <span class="fa sensornet-overview-collapse-icon"></span>
+                                <span>Local Weather <i>(click here to open/close)</i></span>
+                            </h3>
+                        </div>
+                        <div id="wx-collapse" class="panel-collapse collapse">
+                            <div class="panel-body wxsvc-content">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <h4 id="wxsvc-loc" class="wxsvc-center">
+                                            <!-- Current Conditions For:<br> -->
+                                            <span id="wxsvc_plc"></span> 
+                                        </h4>
+                                        <h5 id="wxsvc-when" class="wxsvc-center">
+                                            <!-- <span id="wxsvc_gmt"></span> -->
+                                        </h5>
+                                        <div class="wxsvc-center wxsvc-svc">
+                                            Data &amp; Icons provided by:&nbsp;
+                                            <span id="wxsvc_svc"></span>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <br><br>
+                                <!-- wx data -->
+                                <div class="row">
+                                    <!-- Currently -->
+                                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                        <h5 id="wxsvc-title_cond" class="wxsvc-center">
+                                            Conditions <span id="wxsvc_gmt"></span>
+                                        </h5>
+                                        <!-- conditions -->
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <h6 id="wxsvc-curr_1">
+                                                    <span id="wxsvc_txt"></span>,
+                                                    <span id="wxsvc_t"></span>&nbsp;°F with 
+                                                    <span id="wxsvc_h"></span>&nbsp;%RH
+                                                </h6>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <h6 id="wxsvc-curr_2">
+                                                    The dew point is <span id="wxsvc_dew"></span>&nbsp;°F 
+                                                    <span id="wxsvc_hix_msg">and the heat index is <span id="wxsvc_hix"></span>&nbsp;°F</span>
+                                                </h6>
+                                            </div>
+                                        </div> 
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <h6 id="wxsvc-wind">
+                                                    Winds are <span id="wxsvc_ws"></span>&nbsp;MPH from the 
+                                                    <span id="wxsvc_wd"></span>
+                                                    <span id="wxsvc_wg_msg">and gusting to <span id="wxsvc_wg"></span>&nbsp;MPH.</span>
+                                                </h6>
+                                            </div>
+                                        </div> 
+                                        <!-- /conditions -->
+                                    </div>
+                                    <!-- /Currently -->
+                                    <!-- Forecast -->
+                                    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                                        <h5 id="wxsvc-title_fore" class="wxsvc-center">
+                                            Forecast <span id="wxfcast_gmt"></span>
+                                        </h5>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <!-- forecast table -->
+                                                <div class="table-responsive">
+                                                    <!-- <table id="wxfcast" class="table"> -->
+                                                    <table id="wxfcast" class="wxfcast-table">
+                                                        <tbody id="wxfcast-body">
+                                                            <!-- wx data is added dynamically -->
+                                                            <tr id="wxfcast-day-row">
+                                                                <td id="slot-0" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
+                                                                    <!-- $('td#slot-0 h5.when').text() -->
+                                                                    <h5 class="when"></h5>
+                                                                    <!-- $('td#slot-0 img.icon')[0].src="https://..." -->
+                                                                    <!-- $('td#slot-0 img.icon')[0].alt="..." -->
+                                                                    <img class="icon" src="" alt="">
+                                                                    <!-- $('td#slot-0 p.text').text() -->
+                                                                    <p class="text">
+                                                                    </p>
+                                                                </td>
+                                                                <td id="slot-2" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
+                                                                    <h5 class="when"></h5>
+                                                                    <img class="icon" src="" alt="">
+                                                                    <p class="text">
+                                                                    </p>
+                                                                </td>
+                                                                <td id="slot-4" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
+                                                                    <h5 class="when"></h5>
+                                                                    <img class="icon" src="" alt="">
+                                                                    <p class="text">
+                                                                    </p>
+                                                                </td>
+                                                            </tr>
+                                                            <tr id="wxfcast-night-row">
+                                                                <td id="slot-1" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
+                                                                    <h5 class="when"></h5>
+                                                                    <img class="icon" src="" alt="">
+                                                                    <p class="text">
+                                                                    </p>
+                                                                </td>
+                                                                <td id="slot-3" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
+                                                                    <h5 class="when"></h5>
+                                                                    <img class="icon" src="" alt="">
+                                                                    <p class="text">
+                                                                    </p>
+                                                                </td>
+                                                                <td id="slot-5" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
+                                                                    <h5 class="when"></h5>
+                                                                    <img class="icon" src="" alt="">
+                                                                    <p class="text">
+                                                                    </p>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!-- /forecast table -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /Forecast -->
+                                </div>
+                                <!-- /wx data -->
+                            </div> 
+                        </div> 
+                    </div> 
+                </div> 
+                <!-- /wx panel -->
+            </div>
+            <!-- /SensorNet Local Weather -->
+            <!-- SensorNet Gauge Legend -->
+            <div class="row sensornet-inner">
+                <!-- legend panel -->
+                <div class="col-lg-8 col-lg-offset-2 col-md-12 col-sm-12 col-xs-12">
+                    <div id="legend-panel" class="panel panel-success">
+                        <div class="panel-heading">
+                            <h3 class="panel-title sensor-panel-title sensornet-overview-title collapsed" data-toggle="collapse" data-target="#legend-collapse">
+                                <span class="fa sensornet-overview-collapse-icon"></span>
+                                <span>Gauge Legend <i>(click here to open/close)</i></span>
+                            </h3>
+                        </div>
+                        <div id="legend-collapse" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                        <ul class="gauge_legend_list">
+                                            <li>
+                                                <h6>Temperature °F :</h6>
+                                                <li class="gauge_legend_item">
+                                                    <svg width="75" height="30">
+                                                        <rect x="25" y="20" width="50" height="10" style="fill:blue;stroke-width:3;stroke:white"></rect>
+                                                    </svg>
+                                                    = 25 to 60
+                                                </li>
+                                                <li class="gauge_legend_item">
+                                                    <svg width="75" height="30">
+                                                        <rect x="25" y="20" width="50" height="10" style="fill:green;stroke-width:3;stroke:white"></rect>
+                                                    </svg>
+                                                    = 60 to 90
+                                                </li>
+                                                <li class="gauge_legend_item">
+                                                    <svg width="75" height="30">
+                                                        <rect x="25" y="20" width="50" height="10" style="fill:red;stroke-width:3;stroke:white"></rect>
+                                                    </svg>
+                                                    = 90 to 120
+                                                </li>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                        <ul class="gauge_legend_list gauge_legend_humidity_list">
+                                            <li>
+                                                <h6>% Relative Humidity :</h6>
+                                                <li class="gauge_legend_item">
+                                                    <svg width="75" height="30">
+                                                        <rect x="25" y="20" width="50" height="10" style="fill:#F97600;stroke-width:3;stroke:white"></rect>
+                                                    </svg>
+                                                    = 0 to 40
+                                                </li>
+                                                <li class="gauge_legend_item">
+                                                    <svg width="75" height="30">
+                                                        <rect x="25" y="20" width="50" height="10" style="fill:green;stroke-width:3;stroke:white"></rect>
+                                                    </svg>
+                                                    = 40 to 70
+                                                </li>
+                                                <li class="gauge_legend_item">
+                                                    <svg width="75" height="30">
+                                                        <rect x="25" y="20" width="50" height="10" style="fill:red;stroke-width:3;stroke:white"></rect>
+                                                    </svg>
+                                                    = 70 to 100
+                                                </li>
+                                            </li>
+                                        </ul>
+                                    </div> 
+                                </div> 
+                            </div> 
+                        </div> 
+                    </div> 
+                </div> 
+                <!-- /legend panel -->
+            </div>
+            <!-- /SensorNet Gauge Legend -->
+            <!-- SensorNet Data Purge Status -->
+            <div class="row sensornet-inner">
+                <!-- purge panel -->
+                <div class="col-lg-8 col-lg-offset-2 col-md-12 col-sm-12 col-xs-12">
+                    <div id="purge-panel" class="panel panel-success">
+                        <div class="panel-heading">
+                            <h3 class="panel-title sensor-panel-title sensornet-overview-title collapsed" data-toggle="collapse" data-target="#purge-collapse">
+                                <span class="fa sensornet-overview-collapse-icon"></span>
+                                <span>Purge Status <i>(click here to open/close)</i></span>
+                            </h3>
+                        </div>
+                        <div id="purge-collapse" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12">
+                                        <h6>Last Purge Event : </h6>
+                                        <p><span id="data"></span></p>
+                                        <p><span id="status"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /purge panel -->
+            </div>
+            <!-- /SensorNet Data Purge Status -->
+            <!-- SensorNet Sensor History Graph -->
+            <!-- ^SensorNet Sensor History Graph -->
+        </div>
+    </div>
+    <!-- ^Featured Project - SensorNet -->
+    <!-- Page Footer -->
+    <footer class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container text-center">
+            <p class="navbar-text col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                2017 &copy; 
+                <a href="https://github.com/jxmot/client-dht-udp" target="_blank">
+                    James Motyl
+                </a>
+            </p>
+        </div>
+    </footer>
+    <!-- ^Page Footer -->
+    <!-- Project JS -->
+    <!-- Featured Project - SensorNet -->
+        <!-- for sensor data via socket.io -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-    <!-- google API load -->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-    <!-- control over console.log() behavior -->
+        <!-- using C3 gauges -->
+    <script type="text/javascript" src="assets/js/d3-3.5.6/d3.js"></script>
+    <script type="text/javascript" src="assets/js/c3-0.4.18/c3.js"></script>
+        <!-- control over console.log() behavior -->
     <script type="text/javascript" src="assets/js/consolelog.js"></script>
-    <!-- multi-gauge management -->
-    <script type="text/javascript" src="assets/js/ggauge-cfg.js"></script>
-    <!-- for sensor data via socket.io -->
+        <!-- miscellaneous utility functions -->
+    <script type="text/javascript" src="assets/js/utils.js"></script>
+        <!-- multi-gauge management -->
+    <script type="text/javascript" src="assets/js/c3gauge-cfg.js"></script>
+        <!-- for sensor data via socket.io -->
     <script type="text/javascript" src="assets/js/_socketcfg.js"></script>
     <script type="text/javascript" src="assets/js/appsockets.js"></script>
-    <!-- using google gauges -->
-    <script type="text/javascript" src="assets/js/ggauges.js"></script>
-</head>
-<body>
-    <!-- Gauges -->
-    <div class="container">
-        <div class="inner">
-            <!-- gauge ID"s must match config!!! 
-                 Take a look at gauge-cfg.js, specifically the
-                 `target` member.
-            -->
-            <div id="gaugediv_1"></div>
-        </div>
-        <div class="inner">
-            <!-- gauge ID"s must match config!!! -->
-            <div id="gaugediv_2"></div>
-        </div>
-    </div>
-    <div class="container">
-        <div class="inner">
-            <!-- gauge ID"s must match config!!! 
-                 Take a look at gauge-cfg.js, specifically the
-                 `target` member.
-            -->
-            <div id="gaugediv_3"></div>
-        </div>
-        <div class="inner">
-            <!-- gauge ID"s must match config!!! -->
-            <div id="gaugediv_4"></div>
-        </div>
-    </div>
-    <div class="container">
-        <div class="inner">
-            <!-- gauge ID"s must match config!!! 
-                 Take a look at gauge-cfg.js, specifically the
-                 `target` member.
-            -->
-            <div id="gaugediv_5"></div>
-        </div>
-        <div class="inner">
-            <!-- gauge ID"s must match config!!! -->
-            <div id="gaugediv_6"></div>
-        </div>
-    </div>
-    <div class="container">
-        <div class="inner">
-            <!-- gauge ID"s must match config!!! 
-                 Take a look at gauge-cfg.js, specifically the
-                 `target` member.
-            -->
-            <div id="gaugediv_7"></div>
-        </div>
-        <div class="inner">
-            <!-- gauge ID"s must match config!!! -->
-            <div id="gaugediv_8"></div>
-        </div>
-    </div>
-    <!-- /Gauges -->
+        <!-- for weather service data via socket.io -->
+    <script type="text/javascript" src="assets/js/wxsvc.js"></script>
+        <!-- using C3 gauges -->
+    <script type="text/javascript" src="assets/js/c3gauges.js"></script>
+    <!-- ^Featured Project - SensorNet -->
+    <!-- For navigation and collapsible contents -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- ^For navigation and collapsible contents -->
 </body>
 </html>
+<!-- render done -->

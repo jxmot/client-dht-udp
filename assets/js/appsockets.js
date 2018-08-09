@@ -1,38 +1,61 @@
 /*
-    Application Socket Communication
+    Application Specific Socket.io Initialization and Event Handlers
+
+    (c) 2017 Jim Motyl - https://github.com/jxmot/
 */
 var socket;
 var socketready = false;
 
-// initialize the socket connection and wait for messages
 function initSocket()
 {
-    // initialize
     socket = io.connect(socketserver.host+':'+socketserver.port+'/');
-    // NOTE: this might be removed if no use is needed
-    socket.on('SERVER', function(data) {
-        consolelog('SERVER - '+JSON.stringify(data));
+
+    socket.on('server', function(data) {
+        consolelog('server - '+JSON.stringify(data));
+        // for future use, a placeholder for reacting
+        // to messages from the server itself
         if(data.status === true) socketready = true;
         else socketready = false;
     });
-    // wait for messages
+
     socket.on('status', showStatus);
     socket.on('data', showData);
+    socket.on('purge', showPurge);
+    socket.on('wxobsv', showWXObsv);
+    socket.on('wxfcst', showWXFcast);
+
+    socket.on('disconnect', function(){ 
+        socketready = false;
+        consolelog('ERROR - socket is disconnected');
+    });
 };
-// status has arrived, show it to the client...
+
 function showStatus(data) {
     consolelog('showStatus - '+JSON.stringify(data.payload));
     $(document).trigger(data.payload.dev_id, data.payload);
 };
 
-// data has arrived, show it to the client...
 function showData(data) {
     consolelog('showData - '+JSON.stringify(data.payload));
     $(document).trigger(data.payload.dev_id, data.payload);
 };
 
-// initialize our socket connections when the app is ready
-$(document).on('app_ready', function() {
+function showPurge(data) {
+    consolelog('showPurge - '+JSON.stringify(data.payload));
+    $(document).trigger('purge_status', data.payload);
+};
+
+function showWXObsv(data) {
+    consolelog('showWXObsv - '+JSON.stringify(data.payload));
+    $(document).trigger('wxsvc_obsv', data.payload);
+};
+
+function showWXFcast(data) {
+    consolelog('showWXFcast - '+JSON.stringify(data.payload));
+    $(document).trigger('wxsvc_fcst', data.payload);
+};
+
+$(document).on('gauges_ready', function() {
     // initialize sockets for incoming sensor status and data
     initSocket();
 });

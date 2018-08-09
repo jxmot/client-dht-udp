@@ -6,8 +6,10 @@ _*.*
 node_modules
 _*
 /nbproject/private/
+/3rdparty/
 # misc stuff i want to ignore -
 *.log
+*.csv
 *.txt
 *.bat
 #*.zip

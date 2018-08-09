@@ -5,9 +5,9 @@
 
 This is a web client to my **[node-dht-udp](<https://github.com/jxmot/node-dht-udp>)** server, and displays temperature and humidity using gauges.
 
-## History
+# History
 
-This project was created as part of a larger project that I'll refer to as **_SensorNet_**. The first pass will provide a means to display temperature and humidity for one or more *sensors*. 
+This project was created as part of a larger project that I'll refer to as **_SensorNet_**. 
 
 During the initial development I investigated a number of gauge type displays. My requirements for a gauge included - 
 
@@ -17,187 +17,130 @@ During the initial development I investigated a number of gauge type displays. M
 * The integration must be straight forward and not cumbersome.
 * Must be *responsive*. The gauge(s) must resize as necessary as the browser's viewport size is changed.
 
-After investigating a number of options I decided that *Google Gauges* would be the best choice *at this time*. The other I tried were cumbersome and bug-ridden. In addition their documentation was also lacking. However I will continue to research other options.
+After investigating a number of options I decided that *<a href="https://c3js.org/" target="_blank">C3.js v0.4.18</a>*  would be the best choice. The others I tried were cumbersome and bug-ridden. In addition their documentation was also lacking. However I will continue to research additional options.
 
-The only requirement that isn't met with *Google Gauges* is responsiveness. However I believe that I can implement a method to achieve this.
+# Overview
 
-## Overview
-
-The *complete* SensorNet consists of - 
+The *complete* SensorNet system currently consists of - 
 
 * Temperature & Humidity Sensors - Each sensor consists of a DHT22 device and an ESP-01S.
-* Database Gateway - A NodeJS *server* that listens for sensor data and forwards the data to a database. In the current implementation the database used is *Firebase*.
-* Web Client - A browser based client that monitors the database for new data and displays it to the user.
+* Database Gateway - A NodeJS *server* that listens for sensor data and forwards the data to a database. In the current implementation the database used is *MySQL*. The server uses <a href="https://socket.io/" target="_blank">Socket.io</a> to "push" data updates to all connected web clients.
+* Web Client - A browser based client that waits for status and data updates from the server and displays it to the user. It utilizes HTML/CSS, Bootstrap, JavaScript/JQuery, JSON, and Socket.io.
+
+Here is a high level diagram of the SensorNet system :
 
 <p align="center">
   <img src="./mdimg/basic-flow-1.png" alt="SensorNet Overview" txt="SensorNet Overview"/>
 </p>
 
-## Design Details
+## Page Layout
 
-From this point on it is *assumed* that the reader has some experience with - 
+<p align="center">
+  <img src="./mdimg/sensornet-sshot1-1060x700.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
+</p>
 
-* HTML & CSS - just the basics.
-* JavaScript - specifically events, triggers, and handlers. And accessing the DOM.
-* Firebase - data retrieval.
+The page consists of four sensor *panels*, and three *collapsible panels*. It is responsive and viewable even on smaller mobile screens.
 
-The following topics will be covered in this document - 
+# Design Details
 
-* Gauge configuration & initialization.
-* Data events.
+The SensorNet client function is to render sensor status and data for display on the browser. It does not interact with the SensorNet server except to establish a connection. After that it only receives sensor status and data.
 
-### Gauge Configuration
+The other components of the SensorNet system are here : 
 
-The displayed gauges are configured in an array of objects found in `assets/js/gauge-cfg.js`. The following aspects are configurable - 
+* [esp8266-dht-udp](https://github.com/jxmot/esp8266-dht-udp) : Sensors
+* [node-dht-udp](https://github.com/jxmot/node-dht-udp) : SensorNet Server
 
-* Target HTML element - typically a `<div>` with an ID. The element's ID is considered to be the *target*.
-* Gauge Name/Label - A string that is shown on the gauge face.
-* Gauge Type - In this application the type can be either "**T**" (*temperature*) or "**H**" (*humidity*).
-* Gauge Unit - This can be either "**F**" (*Fahrenheit*) or "**%**" (*percent*). Please note that the display of  this setting will be implemented in a future version of this application.
-* Data Source - Typically this will be "**firebase**", however the code can also accept "**thingspeak**" if the data is routed through **[ThingSpeak](<https://thingspeak.com/>)**.
-* Data Channel - Each of the sensors (*ESP8266 devices*) have unique hostnames. For example - **ESP_49F542** where the last 6 characters represent the 3 right-most octets of the devices' *MAC address*. This will be passed in the data as `dev_id` (*device ID*).
-* Rounding of data values - This `bool` if set to `true` will enable rounding to an integer value. And the gauge will not display any fractional values.
-* Google Gauge Options - This is where the appearance of the gauge is configured. The *range*, width & height, segment colors & ranges, and presence of *ticks* are configured here. See **[Google Charts Visualization: Gauge](<https://developers.google.com/chart/interactive/docs/gallery/gauge>)** for detailed information.
+## Connecting to the SensorNet Server
 
-In addition to gauge configuration settings each gauge in the array also contains a `chart` and `data` object that are representations of the Google Gauge. There is also a function within each gauge object in the array. This function aids in the handling of an event that is triggered for each gauge when new data arrives. The `eventType` is the `data_channel`. And allows for better distribution of incoming data to a specified gauge.
-
-Here is an example of a gauge configuration - 
+Connecting to a Socket.io server is easy. The only *catch* is the client has to wait until all of the gauges have finished initializing. If it didn't wait status & data messages would be lost and not displayed. The gauge initialization code will emit a `gauges_ready` event after it has finished.
 
 ```javascript
-    {
-        target: 'gauge_div3',
-        name:'Den',
-        type: 'T',
-        unit: 'F',
-        data_source: 'firebase',
-        data_channel: 'ESP_49F542',
-        round: false,
-        opt: {
-            min: 25, max: 120, 
-            width: 180, height: 180,
-            yellowColor: 'blue',
-            yellowFrom:25, yellowTo: 55,
-            greenFrom: 55, greenTo: 80,
-            redFrom: 80, redTo: 120,
-            minorTicks: 5
-        },
-        chart: {},
-        data: {},
-        enable: _enable
-    }
-```
+$(document).on('gauges_ready', function() {
+    // initialize sockets for incoming sensor status and data
+    initSocket();
+});
 
-This is the function used in each of the gauge objects - 
+function initSocket()
+{
+    // connect to the server...
+    socket = io.connect(socketserver.host+':'+socketserver.port+'/');
 
-```javascript
-var _enable = function() {
-    var _data = this.data;
-    var _chart = this.chart;
-    var _type = this.type;
-    var _name = this.name;
-    var _opt = this.opt;
-    // NOTE: data_channel is known as "dev_id" in the data
-    $(document).on(this.data_channel, function(e, sdata) {
-        console.log(_name + '  ' + _type);
-        console.log('got data - ' + JSON.stringify(sdata));
+    // let us know when the server sees our connection and sends
+    // us a confirmation...
+    socket.on('server', function(data) {
+        consolelog('server - '+JSON.stringify(data));
+        // for future use, a placeholder for reacting
+        // to messages from the server itself
+        if(data.status === true) socketready = true;
+        else socketready = false;
+    });
 
-        var point = 0;
-        if(_type === 'T') {
-            point = sdata.t;
-        } else point = sdata.h;
-        _data.setValue(0, 1, point);
-        _chart.draw(_data, _opt);
+    // listen for specific messages...
+    socket.on('status', showStatus);
+    socket.on('data', showData);
+    socket.on('purge', showPurge);
+    socket.on('wxobsv', showWXObsv);
+    socket.on('wxfcst', showWXFcast);
+
+    socket.on('disconnect', function(){ 
+        socketready = false;
+        consolelog('ERROR - socket is disconnected');
     });
 };
 ```
 
-The preceding gauge configuration will display like this - 
+### Configuration
+
+The client must connect to a *known* Socket.io server. For convenience, the server's IP address and port number are configurable. An example can be found in `example_socketcfg.js`.
+
+```json
+var socketserver = {
+    host: 'your-socketio-host',
+    port: 3000,
+};
+```
+
+Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match your server and save it. 
+
+## Status and Data Reception
+
+
+
+```javascript
+    // listen for specific messages...
+    socket.on('status', showStatus);
+    socket.on('data', showData);
+    socket.on('purge', showPurge);
+    socket.on('wxobsv', showWXObsv);
+    socket.on('wxfcst', showWXFcast);
+```
+
+### Routing The Messages
+
+## Status and Sensor Data Display
+
+## Gauge Configuration
+
+## System Status
+
+At this time the only system status that the client will display is the *data purge status*. It is an indication of the number of old sensor status and data records that were deleted in a data purge. Please see [node-dht-udp](https://github.com/jxmot/node-dht-udp) for additional details.
 
 <p align="center">
-  <img src="./mdimg/gauge-example-1.png" alt="Gauge Example" txt="Gauge Example"/>
+  <img src="./mdimg/sensornet-sshot3B-1060x400.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
 </p>
 
-Each function instance requires access to members within its associated *gauge object*. This is accomplished with this portion of the code -
 
-```javascript
-    var _data = this.data;
-    var _chart = this.chart;
-    var _type = this.type;
-    var _name = this.name;
-    var _opt = this.opt;
-```
+## Weather Data
 
-Please note that the gauge *options* can be changed during run-time and the gauge's appearance will update on the subsequent data update - `_chart.draw(_data, _opt);`. 
+The SensorNet client does not obtain the weather data from its source. That task belongs to the SensorNet server, along with storing it until requested by a web client. It will also periodically request new data from the weather data provider. And when new data has been collected the SensorNet server will broadcast the data to all connected clients.
 
-#### Gauge Initialization
+<p align="center">
+  <img src="./mdimg/sensornet-sshot2-530x450.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
+</p>
 
-Each gauge in the array is initialized in sequence. This is done when `initGauges()` is called from within `assets/js/ggauges.js` when the gauge is loaded.
+Please see [node-dht-udp](https://github.com/jxmot/node-dht-udp) for additional details.
 
-```javascript
-// load the google gauge visualization - google API load 
-google.load('visualization', '1', {packages:['gauge']});
-google.setOnLoadCallback(initGauges);
-
-// initialize the guages...
-function initGauges() {
-    // initialize all gauges...
-    for(var ix = 0; ix < gauge_cfg.length; ix++)
-    {
-        gauge_cfg[ix].data = new google.visualization.DataTable();
-        gauge_cfg[ix].data.addColumn('string', 'Label');
-        gauge_cfg[ix].data.addColumn('number', 'Value');
-        gauge_cfg[ix].data.addRows(1);
-        // attach the gauge to its DOM target
-        gauge_cfg[ix].chart = new google.visualization.Gauge(document.getElementById(gauge_cfg[ix].target));
-        // set the gauge label, this will be the configured name plus its type
-        gauge_cfg[ix].data.setValue(0, 0, gauge_cfg[ix].name + ' ' + gauge_cfg[ix].type);
-        // choose the appropriate initialization based on the data source 
-        // for the gauge
-        if('thingspeak' === gauge_cfg[ix].data_source) {
-            // This will start a repeating "read" of Thingspeak data, with an
-            // interval that's configured in _thingspk-cfg.js
-            thingspk_loadData(ix);
-            setInterval(thingspk_loadData, thingspk_cfg.interval, ix);
-        } else if('firebase' === gauge_cfg[ix].data_source) {
-            // This gauge uses Firebase. Enable the gauge to receive updates from
-            // the database as records are written to it.
-            gauge_cfg[ix].enable();
-            // The enable() function will read the last written record for only
-            // the most recent sensor. This will insure that each gauge is updated
-            // when it's created.
-            firebase_initGauge(gauge_cfg[ix].data_channel);
-        }
-    }
-};
-```
-
-### Data Events
-
-*Data events* are triggered when a new record is added to the sensor data log. This is done by waiting for the `child_added` Firebase event. For example, in `assets/js/firebase.js` - 
-
-```javascript
-/*
-    Wait for new data to be written to the sensor data log
-*/
-gSensorData.orderByChild('tstamp').limitToLast(1).on('child_added', newSensorData);
-
-function newSensorData(snapShot) {
-    var data = JSON.parse(JSON.stringify(snapShot.val()));
-    $(document).trigger(data.dev_id, data);
-};
-```
-
-#### Handling Incoming Data
-
-
-## Additional Design Considerations
-
-### Limiting Firebase Traffic
-
-Please review the README in the **[node-dht-udp](<https://github.com/jxmot/node-dht-udp>)**  repository for important details.
-
-## Future Development
-
-### Responsive Google Gauges
-
-By nature *Google Gauges* are **not** responsive. My plan is to use the JavaScript `onresize` event to accomplish this. My current gauge implementation writes the gauge options each time the data is updated. So it *should* be possible to alter the size of a guage on the fly as the window is resized. This would require that each gauge save its current data so that a resize will update the gauge without having to wait for a live data update.
+<hr>
+<br>
+<p style="text-align:center">(c) 2018 Jim Motyl - https://github.com/jxmot/</p>
+<br>
