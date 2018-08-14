@@ -80,7 +80,7 @@ var _c3_opt_t = {
         max: 120
     },
     color: {
-        pattern: ['#0000ff', '#00ff00', '#ff0000'],
+        pattern: ['#0000ff', '#00BF00', '#ff0000'],
         threshold: {
             values: [60, 90, 120]
         }
@@ -120,7 +120,7 @@ var _c3_opt_h = {
         }
     },
     color: {
-        pattern: ['#F97600', '#00ff00', '#ff0000'], 
+        pattern: ['#F97600', '#00BF00', '#ff0000'], 
         threshold: {
             values: [40, 70, 100]
         }
