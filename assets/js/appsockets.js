@@ -72,4 +72,13 @@ $(document).on('gauges_ready', function() {
     initSocket();
 });
 
+$(document).on('wxsvc_select', selectWXData);
+
+function selectWXData(e, sel) {
+    if(socketready === true) {
+        consolelog('wxsvc_select - ' + sel);
+        socket.emit('wxsvcsel', {wxsvc: sel});
+    }
+};
+
 
