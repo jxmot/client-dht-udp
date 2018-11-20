@@ -6,9 +6,21 @@
 var socket;
 var socketready = false;
 
-function initSocket()
-{
-    socket = io.connect(socketserver.host+':'+socketserver.port+'/');
+function initSocket() {
+    socket = io.connect(socketserver.host+':'+socketserver.port+'/', {
+                        'reconnection': true,
+                        'reconnectionDelay': 3000,
+                        'reconnectionDelayMax' : 5000,
+                        // FYI, it's odd... 5=6,4=5,etc. that's because
+                        // the 1st attempt is actually a "connect". the
+                        // "reconnect" attempts come after it.
+                        'reconnectionAttempts': 4});
+
+    socket.on('connect_error', function(error) {
+        // it's convenient that the alert halts everything,
+        // makes it easier when restarting the server.
+        alert('connect_error - '+JSON.stringify(error));
+    });
 
     socket.on('server', function(data) {
         consolelog('server - '+JSON.stringify(data));
