@@ -17,9 +17,11 @@
 function adaptColor(selector, parent) {
     // make sure the element actually exists
     if($(selector).length > 0) {
+        $(selector).removeClass('sensornet_label-light-color');
+        $(selector).removeClass('sensornet_label-dark-color');
         // get the background color (RGBA) of the chosen selector,
         // it must start with an HTML tag (div,p,h1-6, and such). 
-        // Then follow it with any level of specifyiing the element.
+        // Then follow it with any level of specifying the element.
         // For example - 
         //      'div.somelcass' - will access all elements that match
         //      '#someid' - a specific element only
@@ -46,9 +48,11 @@ function adaptColor(selector, parent) {
         // see just how light or dark it is...
         if(hsp > 127.5) {
             // and choose the opposite
+            $(selector).removeClass('sensornet_label-light-color');
             $(selector).addClass('sensornet_label-dark-color');
         } else {
             // and choose the opposite
+            $(selector).removeClass('sensornet_label-dark-color');
             $(selector).addClass('sensornet_label-light-color');
         }
     } else consolelog('adaptColor() - selector not found : ' + selector);
