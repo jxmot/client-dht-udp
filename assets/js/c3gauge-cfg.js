@@ -71,7 +71,7 @@ var _c3_opt_t = {
         label: {
             format: function(value, ratio) {
                 // this will disable the label that gets
-                // ddisplayed by c3.js
+                // displayed by c3.js
                 return null;
             },
             show: true
@@ -113,7 +113,7 @@ var _c3_opt_h = {
         label: {
             format: function(value, ratio) {
                 // this will disable the label that gets
-                // ddisplayed by c3.js
+                // displayed by c3.js
                 return null;
             },
             show: true
