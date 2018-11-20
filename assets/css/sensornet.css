@@ -17,10 +17,12 @@
 */
 .sensornet_label-dark-color { 
     color: black;
+    font-weight: bold;
 }
 
 .sensornet_label-light-color { 
     color: white;
+    font-weight: bold;
 }	
 
 
@@ -271,3 +273,8 @@ header > h6 {
     text-align: center;
     font-weight: bold;
 }
+
+.use-pointer {
+    cursor: pointer!important;
+}
+
