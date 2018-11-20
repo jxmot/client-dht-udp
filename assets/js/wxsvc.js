@@ -131,3 +131,109 @@ let card = '?';
     return card;
 };
 
+function makeWidget(slotidx = 0) {
+const slotx = [
+'                                                    <div id="slot_'+slotidx+'" class="wxsvc-three_hour hidden">',
+'                                                        <div class="row wxsvc-widget-row">',
+'                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">',
+'                                                                <div class="row wxsvc-widget-date-row">',
+'                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">',
+'                                                                        <h5 id="wxfcast_date" class="wxsvc-right wxsvc-nomargin-bot"></h5>',
+'                                                                    </div>',
+'                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">',
+'                                                                        <h5 id="wxfcast_time" class="wxsvc-left wxsvc-nomargin-bot"></h5>',
+'                                                                    </div>',
+'                                                                </div>',
+'                                                                <div class="row">',
+'                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">',
+'                                                                        <img id="wxfcast_icon" class="wxsvc-imgcenter" src="">',
+'                                                                    </div>',
+'                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">',
+'                                                                        <h5 id="wxfcast_temp" class="wxsvc-nomargin-bot"></h5>',
+'                                                                    </div>',
+'                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">',
+'                                                                        <h5 id="wxfcast_humi" class="wxsvc-nomargin-bot"></h5>',
+'                                                                    </div>',
+'                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">',
+'                                                                        <h5 id="wxfcast_cond" class="wxsvc-nomargin-bot"></h5>',
+'                                                                    </div>',
+'                                                                </div>',
+'                                                                <div class="row">',
+'                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">',
+'                                                                        <h6 id="wxfcast_winds" class="wxsvc-center wxsvc-nomargin-top"></h6>',
+'                                                                    </div>',
+'                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">',
+'                                                                        <h6 id="wxfcast_windd" class="wxsvc-nomargin-top"></h6>',
+'                                                                    </div>',
+'                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">',
+'                                                                        <h6 id="wxfcast_temph" class="wxsvc-nomargin-top"></h6>',
+'                                                                    </div>',
+'                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">',
+'                                                                        <h6 id="wxfcast_templ" class="wxsvc-nomargin-top"></h6>',
+'                                                                    </div>',
+'                                                                </div>',
+'                                                            </div>',
+'                                                        </div>',
+'                                                    </div>',
+''].join('\n');
+    return slotx;
+};
+
+function makeTable() {
+const table = [
+'                                                    <table id="wxfcast" class="wxfcast-table">',
+'                                                        <tbody id="wxfcast-body">',
+'                                                            <!-- wx data is added dynamically -->',
+'                                                            <tr id="wxfcast-day-row">',
+'                                                                <td id="slot-0" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">',
+'                                                                    <h5 class="when"></h5>',
+'                                                                    <img class="icon" src="" alt="">',
+'                                                                    <p class="text">',
+'                                                                    </p>',
+'                                                                </td>',
+'                                                                <td id="slot-2" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">',
+'                                                                    <h5 class="when"></h5>',
+'                                                                    <img class="icon" src="" alt="">',
+'                                                                    <p class="text">',
+'                                                                    </p>',
+'                                                                </td>',
+'                                                                <td id="slot-4" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">',
+'                                                                    <h5 class="when"></h5>',
+'                                                                    <img class="icon" src="" alt="">',
+'                                                                    <p class="text">',
+'                                                                    </p>',
+'                                                                </td>',
+'                                                            </tr>',
+'                                                            <tr id="wxfcast-night-row">',
+'                                                                <td id="slot-1" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">',
+'                                                                    <h5 class="when"></h5>',
+'                                                                    <img class="icon" src="" alt="">',
+'                                                                    <p class="text">',
+'                                                                    </p>',
+'                                                                </td>',
+'                                                                <td id="slot-3" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">',
+'                                                                    <h5 class="when"></h5>',
+'                                                                    <img class="icon" src="" alt="">',
+'                                                                    <p class="text">',
+'                                                                    </p>',
+'                                                                </td>',
+'                                                                <td id="slot-5" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">',
+'                                                                    <h5 class="when"></h5>',
+'                                                                    <img class="icon" src="" alt="">',
+'                                                                    <p class="text">',
+'                                                                    </p>',
+'                                                                </td>',
+'                                                            </tr>',
+'                                                        </tbody>',
+'                                                    </table>',
+''].join('\n');
+    return table;
+};
+
+function dayOfWeek(dt) {
+
+const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    return days[dt.getDay()];
+};
+
