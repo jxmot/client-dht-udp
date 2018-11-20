@@ -1,28 +1,127 @@
 
+let MAX_DAY_PERIODS = 24;
+
+let wxsvc_selection = '';
+
 (function() {
-    adaptColor('div.wxsvc-content');
-    //      OR
-    //adaptColor('div.wxsvc-content','div.panel-body');
+
+    let count = $("#wxsvc-picker").data().count;
+    for(let ix = 1;ix <= count; ix++) {
+        if($('#wxsvc_src-'+ix).prop('checked') === true) {
+            wxsvc_selection = $('#wxsvc_src-'+ix).data().wxsvc;
+            break;
+        }
+    }
+
+    createOWMWidgets();
+    createNOAATable();
+
+    $(document).on('wxsvc_obsv', wxsvc_obsv);
+    $(document).on('wxsvc_fcst', wxsvc_fcst);
 })();
 
-$(document).on('wxsvc_obsv', function(e, payload) {
+function createOWMWidgets() {
+    for(let ix = 0; ix < MAX_DAY_PERIODS; ix++) {
+        let w = makeWidget(ix);
+        $('#forecast_widgets').append(w);
+    }
+};
+
+function createNOAATable() {
+    let t = makeTable();
+    $('#forecast_table').append(t);
+}
+
+function wxsvc_obsv(e, payload) {
 
     let wxdata = JSON.parse(JSON.stringify(payload));
+
+    if(wxsvc_selection === wxdata.format) {
+        switch(wxdata.format) {
+            case 'owm-v25':
+                updateOWMObsv(wxdata);
+                break;
+    
+            case 'noaa-v3':
+                updateNOAAObsv(wxdata);
+                break;
+    
+            default:
+                break;
+        }
+    }
+};
+
+function updateOWMObsv(wxdata) {
+    noaaObsvOff();
 
     $('#wxsvc_plc').text(wxdata.plc);
 
     let obsdate = new Date(wxdata.gmt);
     let gmt = obsdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
-    $('#wxsvc_gmt').text('On ' + gmt.replace(',', ' @'));
+    gmt = gmt.replace(' ', '');
+    let ob = gmt.split(',');
+    let time = ob[1].split(':');
+    $('#wxsvc_gmt').text(ob[0] + ' @ ' + time[0] + ':' + time[1]);
 
     $('#wxsvc_svc').text(wxdata.svc);
-    $('#wxsvc_txt').text(wxdata.txt);
+
+    // get sunrise/set times and use just the time
+    $('#wxsvc_sun').removeClass('hidden');
+    let sr = new Date(wxdata.sr);
+
+    let sundy = sr.toLocaleDateString();
+    $('#wxsvc_sundy').text(sundy);
+
+    let sunup = sr.getHours() + ':' + sr.getMinutes();
+    $('#wxsvc_sunup').text(sunup);
+
+// TODO : convert to function
+    let ss = new Date(wxdata.ss);
+    let sundn = ss.getHours() + ':' + ss.getMinutes();
+    $('#wxsvc_sundn').text(sundn);
+
+    $('#wxsvc_ico').removeClass('hidden');
+    $('#wxsvc_ico')[0].src  = wxdata.icon;
+    $('#wxsvc_ico')[0].alt  = wxdata.desc;
+
+    $('#wxsvc_desc').removeClass('hidden');
+    $('#wxsvc_comma').removeClass('hidden');
+    $('#wxsvc_desc').text(wxdata.desc);
+
+    $('#wxsvc_t').text(Math.round(wxdata.t));
+    $('#wxsvc_h').text(wxdata.h);
+
+    $('#wxsvc_tminmax').removeClass('hidden');
+    $('#wxsvc_tmin').text(Math.round(wxdata.tmin));
+    $('#wxsvc_tmax').text(Math.round(wxdata.tmax));
+
+    $('#wxsvc_ws').text(Math.round(wxdata.ws));
+    $('#wxsvc_wd').text(degToCard(wxdata.wd));
+};
+
+function updateNOAAObsv(wxdata) {
+    owmObsvOff();
+
+    $('#wxsvc_plc').text(wxdata.plc);
+
+    let obsdate = new Date(wxdata.gmt);
+    let gmt = obsdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+    $('#wxsvc_gmt').text(gmt.replace(',', ' @'));
+
+    $('#wxsvc_svc').text(wxdata.svc);
+
+    $('#wxsvc_desc').removeClass('hidden');
+    $('#wxsvc_comma').removeClass('hidden');
+    $('#wxsvc_ico').addClass('hidden');
+
+    $('#wxsvc_desc').text(wxdata.txt);
     $('#wxsvc_t').text(wxdata.t);
     $('#wxsvc_h').text(wxdata.h);
 
     // todo: check all values, adjust all text as needed
+    $('#wxsvc_dewhix').removeClass('hidden');
     $('#wxsvc_dew').text(wxdata.dew);
-
     if(wxdata.hix < 0) $('#wxsvc_hix_msg').addClass('hidden');
     else {
         $('#wxsvc_hix_msg').removeClass('hidden');
@@ -34,19 +133,156 @@ $(document).on('wxsvc_obsv', function(e, payload) {
     $('#wxsvc_ws').text(wxdata.ws);
     $('#wxsvc_wd').text(degToCard(wxdata.wd));
     // todo: check value, adjust text as needed
-    if(wxdata.wg < 0) $('#wxsvc_wg_msg').addClass('hidden');
+    if((wxdata.wg < 0) || (wxdata.wg === undefined)) $('#wxsvc_wg_msg').addClass('hidden');
     else {
         $('#wxsvc_wg_msg').removeClass('hidden');
         $('#wxsvc_wg').text(wxdata.wg);
     }
-});
+};
 
-$(document).on('wxsvc_fcst', function(e, payload) {
-
-    clearForecast();
+function wxsvc_fcst(e, payload) {
 
     let wxdata = JSON.parse(JSON.stringify(payload));
 
+    if(wxsvc_selection === wxdata.format) {
+        switch(wxdata.format) {
+            case 'owm-v25':
+                $('#forecast_table').addClass('hidden');
+                $('#forecast_widgets').removeClass('hidden');
+                clearOWMFcasts();
+                updateOWMFcast(wxdata);
+                break;
+    
+            case 'noaa-v3':
+                $('#forecast_widgets').addClass('hidden');
+                $('#forecast_table').removeClass('hidden');
+                clearNOAAFcast();
+                updateNOAAFcast(wxdata);
+                break;
+    
+            default:
+                break;
+        }
+    }
+};
+
+function updateOWMFcast(wxdata) {
+
+    let currFcast = JSON.parse(JSON.stringify(wxdata));
+
+    let fcastdate = new Date(currFcast.gmt);
+    let gmt = fcastdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+    gmt = gmt.replace(' ', '');
+    let ob = gmt.split(',');
+    let time = ob[1].split(':');
+    $('#wxfcast_gmt').text(ob[0] + ' @ ' + time[0] + ':' + time[1]);
+
+    for(let ix = 0; ix < MAX_DAY_PERIODS; ix++) {
+        let fcdate = new Date(currFcast.per[ix].dt);
+        let fcdt = fcdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+        let fc = fcdt.split(', ');
+        let time = fc[1].split(':');
+
+        let todate = new Date(currFcast.per[ix].dt + (10800 * 1000));
+        let todt = todate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+        let to = todt.split(', ');
+        let totime = to[1].split(':');
+
+        $('#slot_'+ix+' #wxfcast_date')[0].innerText  = fc[0] + ', ' + dayOfWeek(fcdate);
+//        $('#slot_'+ix+' #wxfcast_date')[0].innerText  = '['+ix+']-' + fc[0] + ', ' + dayOfWeek(fcdate);
+        $('#slot_'+ix+' #wxfcast_time')[0].innerText  = time[0] + ':' + time[1] + ' to ' + totime[0] + ':' + totime[1];
+
+        setOWMFcastHeader(ix, time[0]);
+
+        $('#slot_'+ix+' #wxfcast_icon')[0].src        = currFcast.per[ix].icon;
+        $('#slot_'+ix+' #wxfcast_temp')[0].innerText  = Math.round(currFcast.per[ix].t) + '°';
+        $('#slot_'+ix+' #wxfcast_humi')[0].innerText  = currFcast.per[ix].h + '%RH';
+        $('#slot_'+ix+' #wxfcast_cond')[0].innerText  = currFcast.per[ix].main;
+
+        $('#slot_'+ix+' #wxfcast_winds')[0].innerText = Math.round(currFcast.per[ix].ws) + ' MPH';
+        $('#slot_'+ix+' #wxfcast_windd')[0].innerText = degToCard(currFcast.per[ix].wd);
+        $('#slot_'+ix+' #wxfcast_templ')[0].innerText = 'Low : ' + Math.round(currFcast.per[ix].tmin) + '°';
+        $('#slot_'+ix+' #wxfcast_temph')[0].innerText = 'High : ' + Math.round(currFcast.per[ix].tmax) + '°';
+    }
+};
+
+$('#wxsvc_src-1').on('change', newWXSvc);
+$('#wxsvc_src-2').on('change', newWXSvc);
+
+function newWXSvc() {
+    wxsvc_selection = this.dataset.wxsvc;
+    $(document).trigger('wxsvc_select', [wxsvc_selection]);
+};
+
+/*
+    hours for color change - 
+    sunrise 06
+    midday 09,12,15
+    sunset  18
+    night  21
+    midnight 00,03
+*/
+
+let HDRCLASS = 0;
+let HOURS = 1;
+
+let dayperiods = [
+    ['wxsvc-widget-sunrise',  '06'],
+    ['wxsvc-widget-midday',   '09,12,15'],
+    ['wxsvc-widget-sunset',   '18'],
+    ['wxsvc-widget-night',    '21'],
+    ['wxsvc-widget-midnight', '00,03']
+];
+
+function clearHdrClass(ix) {
+    for(let hx = 0; hx < dayperiods.length; hx++) {
+        $('#slot_'+ix+' div.wxsvc-widget-date-row').removeClass(dayperiods[hx][HDRCLASS]);
+    }
+};
+
+function applyHdrClass(ix, hdrclass) {
+    $('#slot_'+ix+' div.wxsvc-widget-date-row').addClass(hdrclass);
+    adaptColor('#slot_'+ix+' div.wxsvc-widget-date-row h5','#slot_'+ix+' div.wxsvc-widget-date-row');
+    $('#slot_'+ix).removeClass('hidden');
+};
+
+function setOWMFcastHeader(ix, hour) {
+let hdrclass = '';
+
+    clearHdrClass(ix);
+
+    for(let hx = 0; hx < dayperiods.length; hx++) {
+        if(dayperiods[hx][HOURS].includes(hour)) {
+            hdrclass = dayperiods[hx][HDRCLASS];
+            break;
+        }
+    }
+
+    applyHdrClass(ix, hdrclass);
+};
+
+function clearOWMFcast(ix) {
+    $('#slot_'+ix+' #wxfcast_date')[0].innerText  = '';
+    $('#slot_'+ix+' #wxfcast_time')[0].innerText  = '';
+    $('#slot_'+ix+' #wxfcast_icon')[0].src        = '';
+    $('#slot_'+ix+' #wxfcast_temp')[0].innerText  = '';
+    $('#slot_'+ix+' #wxfcast_humi')[0].innerText  = '';
+    $('#slot_'+ix+' #wxfcast_cond')[0].innerText  = '';
+    $('#slot_'+ix+' #wxfcast_winds')[0].innerText = '';
+    $('#slot_'+ix+' #wxfcast_windd')[0].innerText = '';
+    $('#slot_'+ix+' #wxfcast_temph')[0].innerText = '';
+    $('#slot_'+ix+' #wxfcast_templ')[0].innerText = '';
+};
+
+function clearOWMFcasts() {
+    $('#wxfcast_gmt').text('');
+
+    for(let ix = 0; ix < MAX_DAY_PERIODS; ix++) {
+        clearOWMFcast(ix);
+    }
+};
+
+function updateNOAAFcast(wxdata) {
     let fcastdate = new Date(wxdata.gmt);
     let gmt = fcastdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
     $('#wxfcast_gmt').text('On ' + gmt.replace(',', ' @'));
@@ -60,16 +296,32 @@ $(document).on('wxsvc_fcst', function(e, payload) {
             $('td#slot-'+slotix+' p.text').text(wxdata.per[ix].text);
         }
     }
-});
+};
 
-function clearForecast() {
-    $('#wxfcast_gmt').text("");
+function clearNOAAFcast(ix = 0) {
+    $('#wxfcast_gmt').text('');
     for(ix = 0; ix < 6; ix++) {
-        $('td#slot-'+ix+' h5.when').text("");
-        $('td#slot-'+ix+' img.icon')[0].src = "";
-        $('td#slot-'+ix+' img.icon')[0].alt = "";
-        $('td#slot-'+ix+' p.text').text("");
+        $('td#slot-'+ix+' h5.when').text('');
+        $('td#slot-'+ix+' img.icon')[0].src = '';
+        $('td#slot-'+ix+' img.icon')[0].alt = '';
+        $('td#slot-'+ix+' p.text').text('');
     }
+};
+
+function noaaObsvOff() {
+    $('#wxsvc_desc').addClass('hidden');
+    $('#wxsvc_comma').addClass('hidden');
+    $('#wxsvc_dewhix').addClass('hidden');
+    $('#wxsvc_hix_msg').addClass('hidden');
+    $('#wxsvc_wg_msg').addClass('hidden');
+};
+
+function owmObsvOff() {
+    $('#wxsvc_sun').addClass('hidden');
+    $('#wxsvc_ico').addClass('hidden');
+    $('#wxsvc_desc').addClass('hidden');
+    $('#wxsvc_comma').addClass('hidden');
+    $('#wxsvc_tminmax').addClass('hidden');
 };
 
 /*
