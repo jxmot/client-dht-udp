@@ -1,10 +1,30 @@
 # client-dht-udp
 
-This is a web client to my **[node-dht-udp](<https://github.com/jxmot/node-dht-udp>)** server, and displays temperature and humidity using gauges.
+This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-udp)** server, and displays temperature and humidity using gauges. It also displays current weather condition and forecast data from a *selectable* weather data source.
+
+
+- [History](#history)
+- [Overview](#overview)
+  * [Application UI Layout](#application-ui-layout)
+    + [Sensor Data Display](#sensor-data-display)
+    + [System Status](#system-status)
+    + [Weather Data](#weather-data)
+- [Design Details](#design-details)
+  * [Gauges](#gauges)
+    + [Configuration](#configuration)
+    + [Run Time Communication](#run-time-communication)
+  * [Sensor Status](#sensor-status)
+  * [Connecting to the SensorNet Server](#connecting-to-the-sensornet-server)
+    + [Configuration](#configuration-1)
+  * [Status and Data Reception](#status-and-data-reception)
+    + [Routing The Messages](#routing-the-messages)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 # History
 
-This project was created as part of a larger project that I'll refer to as **_SensorNet_**. 
+This project was created as a submodule of a larger project that I'll refer to as **_SensorNet_**. That project can be found here - **[sensornet](https://github.com/jxmot/sensornet)**.
 
 During the initial development I investigated a number of gauge type displays. My requirements for a gauge included - 
 
@@ -18,19 +38,8 @@ After investigating a number of options I decided that *<a href="https://c3js.or
 
 # Overview
 
-The *complete* SensorNet system currently consists of - 
 
-* Temperature & Humidity Sensors - Each sensor consists of a DHT22 device and an ESP-01S.
-* Database Gateway - A NodeJS *server* that listens for sensor data and forwards the data to a database. In the current implementation the database used is *MySQL*. The server uses <a href="https://socket.io/" target="_blank">Socket.io</a> to "push" data updates to all connected web clients.
-* Web Client - A browser based client that waits for status and data updates from the server and displays it to the user. It utilizes HTML/CSS, Bootstrap, JavaScript/JQuery, JSON, and Socket.io.
-
-Here is a high level diagram of the SensorNet system :
-
-<p align="center">
-  <img src="./mdimg/basic-flow-1.png" alt="SensorNet Overview" txt="SensorNet Overview"/>
-</p>
-
-## Page Layout
+## Application UI Layout
 
 <p align="center">
   <img src="./mdimg/sensornet-sshot1-1060x700.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
@@ -38,16 +47,46 @@ Here is a high level diagram of the SensorNet system :
 
 The page consists of four sensor *panels*, and three *collapsible panels*. It is responsive and viewable even on smaller mobile screens.
 
+### Sensor Data Display
+
+<p align="center">
+  <img src="./mdimg/sensornet-sshot1b-530x237.png" style="width:65%"; alt="SensorNet Screen Shot #1b" txt="SensorNet Screen Shot #1"/>
+</p>
+
+### System Status
+
+At this time the only system status that the client will display is the *data purge status*. It is an indication of the number of old sensor status and data records that were deleted in a data purge. Please see [node-dht-udp](https://github.com/jxmot/node-dht-udp) for additional details.
+
+<p align="center">
+  <img src="./mdimg/sensornet-sshot3B-1060x400.png" style="width:65%"; alt="SensorNet Screen Shot #3b" txt="SensorNet Screen Shot #3b"/>
+</p>
+
+### Weather Data
+
+The SensorNet client does not obtain the weather data from its source. That task belongs to the SensorNet server, along with storing it until requested by a web client. The server will periodically request new data from the weather data provider. And when new data has been collected the SensorNet server will broadcast the data to all connected clients.
+
+<p align="center">
+  <img src="./mdimg/sensornet-sshot2-530x408.png" style="width:65%"; alt="SensorNet Screen Shot #2" txt="SensorNet Screen Shot #2"/>
+</p>
+
+<p align="center">
+  <img src="./mdimg/sensornet-sshot2b-530x298.png" style="width:65%"; alt="SensorNet Screen Shot #2b" txt="SensorNet Screen Shot #2b"/>
+</p>
+
+Please see [node-dht-udp](https://github.com/jxmot/node-dht-udp) for additional details.
+
 # Design Details
 
-The SensorNet client function is to render sensor status and data for display on the browser. It does not interact with the SensorNet server except to establish a connection. After that it only receives sensor status and data.
+The SensorNet client function is to render sensor status and data for display on the browser. It does not interact with the SensorNet server except to establish a connection and to request to change the weather data source. After that it only receives sensor status & data, and weather condition & forecast data.
 
-The other components of the SensorNet system are here : 
+## Application Start Up
 
-* [esp8266-dht-udp](https://github.com/jxmot/esp8266-dht-udp) : Sensors
-* [node-dht-udp](https://github.com/jxmot/node-dht-udp) : SensorNet Server
+<p align="center">
+  <img src="./mdimg/appstart-flow-860x497.png" style="width:80%;"alt="Client start up" txt="Client start up"/>
+</p>
 
-## Connecting to the SensorNet Server
+
+### Connecting to the SensorNet Server
 
 Connecting to a Socket.io server is easy. The only *catch* is the client has to wait until all of the gauges have finished initializing. If it didn't wait status & data messages would be lost and not displayed. The gauge initialization code will emit a `gauges_ready` event after it has finished.
 
@@ -57,22 +96,34 @@ $(document).on('gauges_ready', function() {
     initSocket();
 });
 
-function initSocket()
-{
-    // connect to the server...
-    socket = io.connect(socketserver.host+':'+socketserver.port+'/');
 
-    // let us know when the server sees our connection and sends
-    // us a confirmation...
+var socket;
+var socketready = false;
+
+function initSocket() {
+    socket = io.connect(socketserver.host+':'+socketserver.port+'/', {
+                        'reconnection': true,
+                        'reconnectionDelay': 3000,
+                        'reconnectionDelayMax' : 5000,
+                        // FYI, it's odd... 5=6,4=5,etc. that's because
+                        // the 1st attempt is actually a "connect". the
+                        // "reconnect" attempts come after it.
+                        'reconnectionAttempts': 4});
+
+    socket.on('connect_error', function(error) {
+        // it's convenient that the alert halts everything,
+        // makes it easier when restarting the server.
+        alert('connect_error - '+JSON.stringify(error));
+    });
+
     socket.on('server', function(data) {
-        consolelog('server - '+JSON.stringify(data));
+        console.log('server - '+JSON.stringify(data));
         // for future use, a placeholder for reacting
         // to messages from the server itself
         if(data.status === true) socketready = true;
         else socketready = false;
     });
 
-    // listen for specific messages...
     socket.on('status', showStatus);
     socket.on('data', showData);
     socket.on('purge', showPurge);
@@ -86,7 +137,7 @@ function initSocket()
 };
 ```
 
-### Configuration
+#### Configuration
 
 The client must connect to a *known* Socket.io server. For convenience, the server's IP address and port number are configurable. An example can be found in `example_socketcfg.js`.
 
@@ -99,9 +150,7 @@ var socketserver = {
 
 Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match your server and save it. 
 
-## Status and Data Reception
-
-
+### Status and Data Reception
 
 ```javascript
     // listen for specific messages...
@@ -112,31 +161,78 @@ Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match yo
     socket.on('wxfcst', showWXFcast);
 ```
 
-### Routing The Messages
+## Gauges 
 
-## Data Display
+The gauges in this application are based on the C3.js gauge example found [here](https://c3js.org/samples/chart_gauge.html).
 
-## Gauge Configuration
+There have been many changes made to how the gauges are implemented. In this application each gauge is kept as an object in an array. The objects contain - 
 
-## System Status
+* gauge application-specific configuration items
+* gauge-instance specific appearance configuration items - type, range, color bands, caption, etc
+* gauge-instance specific functions and event handlers
 
-At this time the only system status that the client will display is the *data purge status*. It is an indication of the number of old sensor status and data records that were deleted in a data purge. Please see [node-dht-udp](https://github.com/jxmot/node-dht-udp) for additional details.
+### Initialization
 
-<p align="center">
-  <img src="./mdimg/sensornet-sshot3B-1060x400.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
-</p>
+### Configuration
+
+### Run Time Communication
 
 
-## Weather Data
 
-The SensorNet client does not obtain the weather data from its source. That task belongs to the SensorNet server, along with storing it until requested by a web client. It will also periodically request new data from the weather data provider. And when new data has been collected the SensorNet server will broadcast the data to all connected clients.
+## Sensor Status
 
-<p align="center">
-  <img src="./mdimg/sensornet-sshot2-530x450.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
-</p>
+## Sensor Data
 
-Please see [node-dht-udp](https://github.com/jxmot/node-dht-udp) for additional details.
+## Weather Data Retrieval
 
+### Configuration
+
+### Service Selection
+
+#### Switching Between Services
+
+```html
+<div id="wxsvc-picker" class="wxsvc-center" data-count=2>
+    <h5>Choose a data source:</h5>
+    <div class="radio-inline">
+        <label class="use-pointer"><input class="use-pointer" id="wxsvc_src-1" type="radio" data-wxsvc="noaa-v3" name="optradio">NOAA</label>
+    </div>
+    <div class="radio-inline">
+        <label class="use-pointer"><input class="use-pointer" id="wxsvc_src-2" type="radio" data-wxsvc="owm-v25" name="optradio" checked>OpenWeatherMap</label>
+    </div>
+</div>
+```
+
+```javascript
+let wxsvc_selection = '';
+
+(function() {
+    let count = $("#wxsvc-picker").data().count;
+    for(let ix = 1;ix <= count; ix++) {
+        if($('#wxsvc_src-'+ix).prop('checked') === true) {
+            wxsvc_selection = $('#wxsvc_src-'+ix).data().wxsvc;
+            break;
+        }
+    }
+};
+
+$('#wxsvc_src-1').on('change', newWXSvc);
+$('#wxsvc_src-2').on('change', newWXSvc);
+
+function newWXSvc() {
+    wxsvc_selection = this.dataset.wxsvc;
+    $(document).trigger('wxsvc_select', [wxsvc_selection]);
+};
+```
+
+
+
+
+
+
+
+
+<br>
 <hr>
 <br>
 <p style="text-align:center">(c) 2018 Jim Motyl - https://github.com/jxmot/</p>
