@@ -5,19 +5,25 @@ This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-ud
 
 - [History](#history)
 - [Overview](#overview)
+  * [Technologies Used](#technologies-used)
   * [Application UI Layout](#application-ui-layout)
     + [Sensor Data Display](#sensor-data-display)
     + [System Status](#system-status)
     + [Weather Data](#weather-data)
 - [Design Details](#design-details)
+  * [Application Start Up](#application-start-up)
   * [Gauges](#gauges)
     + [Configuration](#configuration)
-    + [Run Time Communication](#run-time-communication)
-  * [Sensor Status](#sensor-status)
+    + [Initialization](#initialization)
   * [Connecting to the SensorNet Server](#connecting-to-the-sensornet-server)
     + [Configuration](#configuration-1)
-  * [Status and Data Reception](#status-and-data-reception)
-    + [Routing The Messages](#routing-the-messages)
+    + [Status and Data Reception](#status-and-data-reception)
+  * [Sensor Status](#sensor-status)
+  * [Sensor Data](#sensor-data)
+  * [Weather Data Retrieval](#weather-data-retrieval)
+    + [Configuration](#configuration-2)
+    + [Service Selection](#service-selection)
+      - [Switching Between Services](#switching-between-services)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -38,6 +44,12 @@ After investigating a number of options I decided that *<a href="https://c3js.or
 
 # Overview
 
+## Technologies Used
+
+* HTML/CSS
+* Bootstrap
+* JavaScript/jQuery
+* 
 
 ## Application UI Layout
 
@@ -77,7 +89,7 @@ Please see [node-dht-udp](https://github.com/jxmot/node-dht-udp) for additional 
 
 # Design Details
 
-The SensorNet client function is to render sensor status and data for display on the browser. It does not interact with the SensorNet server except to establish a connection and to request to change the weather data source. After that it only receives sensor status & data, and weather condition & forecast data.
+The SensorNet client function is to render sensor status and data for display in a browser. It does not interact with the SensorNet server except to establish a connection and to request to change the weather data source. After that it only receives sensor status & data, and weather condition & forecast data.
 
 ## Application Start Up
 
@@ -86,7 +98,126 @@ The SensorNet client function is to render sensor status and data for display on
 </p>
 
 
-### Connecting to the SensorNet Server
+## Gauges 
+
+The gauges in this application are based on the C3.js gauge example found [here](https://c3js.org/samples/chart_gauge.html).
+
+There have been many changes made to how the gauges are implemented. In this application each gauge is kept as an object in an array. The objects contain - 
+
+* gauge application-specific configuration items
+* gauge-instance specific appearance configuration items - type, range, color bands, caption, etc
+* gauge-instance specific functions and event handlers
+
+### Configuration
+
+The gauges are grouped in pairs, one gauge for temperature and the other is humidity. And each gauge is represented as an object within an array. In HTML the pair of gauges reside in a *panel* along with sensor status messages.
+
+Here's an example of a configuration for two gauges in the same panel : 
+
+```javascript
+var gauge_cfg = [
+    // Temperature Gauge
+    {
+        data_channel: 'ESP_49F542',
+        name: 'Den',
+        target: 'gaugediv_1',
+
+        type: t_gauge.type,
+        unit: t_gauge.unit,
+
+        label: 'gaugelab_1',
+        device: 'gauge_device_1',
+        info: 'gauge_update_1',
+        status: 'gauge_status_1',
+
+        round: false,
+
+        opt: _c3_temp_gauge.opt,
+        chart: {},
+        data: {},
+        enable: _c3_enable
+    },
+    // Humidity Gauge
+    {
+        data_channel: 'ESP_49F542',
+        name: 'Den',
+        target: 'gaugediv_2',
+
+        type: h_gauge.type,
+        unit: h_gauge.unit,
+
+        label: 'gaugelab_2',
+        device: 'gauge_device_1',
+        info: 'gauge_update_1',
+        status: 'gauge_status_1',
+
+        round: false,
+
+        opt: _c3_humi_gauge.opt,
+        chart: {},
+        data: {},
+        enable: _c3_enable
+    }
+};
+```
+
+Please note that there is some duplication of fields between paired gauges(*temperature & humidity*). And at this time the duplication is intentional. The purpose was to insure that *each* gauge was independent of the others and could have its own text elements assigned to it.
+
+And here's the associated HTML : 
+
+```html
+<div class="col-lg-2 col-lg-offset-2 col-md-3 col-sm-6 col-xs-12">
+    <div id="sensor-panel-1" class="panel panel-success">
+        <div class="panel-heading">
+            <h3 id="sensor-panel-title-1" class="panel-title sensor-panel-title">Den</h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                    <div id="gaugediv_1" class="gauge_inner"></div>
+                    <div id="gaugelab_1" class="gauge_label"></div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                    <div id="gaugediv_2" class="gauge_inner"></div>
+                    <div id="gaugelab_2" class="gauge_label"></div>
+                </div>
+            </div>
+            <br>
+            <header><h6>Device :</h6> <span id="gauge_device_1"></span></header>
+            <header><h6>Update :</h6> <span id="gauge_update_1"></span></header>
+            <header><h6>Status :</h6> <span id="gauge_status_1"></span></header>
+        </div>
+    </div>
+</div>
+```
+
+### Initialization
+
+<p align="center">
+  <img src="./mdimg/gauges_init-flow-1-350x1368.png" style="width:20%;" alt="Client start up" txt="Client start up"/>
+</p>
+
+```javascript
+(function() {
+    initGauges();
+})();
+
+function initGauges() {
+    // initialize all gauges...
+    for(var ix = 0; ix < gauge_cfg.length; ix++)
+    {
+        // attach the gauge to its DOM target
+        gauge_cfg[ix].opt.bindto = document.getElementById(gauge_cfg[ix].target);
+        gauge_cfg[ix].chart = c3.generate(gauge_cfg[ix].opt);
+        gauge_cfg[ix].enable();
+    }
+    // let the app know we're ready for incoming sensor 
+    // status and data
+    $(document).trigger('gauges_ready', true);
+};
+```
+
+## Connecting to the SensorNet Server
 
 Connecting to a Socket.io server is easy. The only *catch* is the client has to wait until all of the gauges have finished initializing. If it didn't wait status & data messages would be lost and not displayed. The gauge initialization code will emit a `gauges_ready` event after it has finished.
 
@@ -105,9 +236,6 @@ function initSocket() {
                         'reconnection': true,
                         'reconnectionDelay': 3000,
                         'reconnectionDelayMax' : 5000,
-                        // FYI, it's odd... 5=6,4=5,etc. that's because
-                        // the 1st attempt is actually a "connect". the
-                        // "reconnect" attempts come after it.
                         'reconnectionAttempts': 4});
 
     socket.on('connect_error', function(error) {
@@ -118,8 +246,6 @@ function initSocket() {
 
     socket.on('server', function(data) {
         console.log('server - '+JSON.stringify(data));
-        // for future use, a placeholder for reacting
-        // to messages from the server itself
         if(data.status === true) socketready = true;
         else socketready = false;
     });
@@ -137,7 +263,9 @@ function initSocket() {
 };
 ```
 
-#### Configuration
+**NOTE : The SensorNet server must be running and accessible over the network by the client.**
+
+### Configuration
 
 The client must connect to a *known* Socket.io server. For convenience, the server's IP address and port number are configurable. An example can be found in `example_socketcfg.js`.
 
@@ -150,7 +278,7 @@ var socketserver = {
 
 Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match your server and save it. 
 
-### Status and Data Reception
+## Status and Data Reception
 
 ```javascript
     // listen for specific messages...
@@ -161,27 +289,20 @@ Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match yo
     socket.on('wxfcst', showWXFcast);
 ```
 
-## Gauges 
 
-The gauges in this application are based on the C3.js gauge example found [here](https://c3js.org/samples/chart_gauge.html).
 
-There have been many changes made to how the gauges are implemented. In this application each gauge is kept as an object in an array. The objects contain - 
 
-* gauge application-specific configuration items
-* gauge-instance specific appearance configuration items - type, range, color bands, caption, etc
-* gauge-instance specific functions and event handlers
-
-### Initialization
-
-### Configuration
-
-### Run Time Communication
 
 
 
 ## Sensor Status
 
 ## Sensor Data
+
+## Data Purge Status
+
+
+
 
 ## Weather Data Retrieval
 
