@@ -301,9 +301,6 @@ Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match yo
 
 ## Data Purge Status
 
-
-
-
 ## Weather Data Retrieval
 
 ### Configuration
@@ -346,12 +343,28 @@ function newWXSvc() {
 };
 ```
 
+# Extras
 
+* `consolelog.js` - `consolelog()`, an alternative to `console.log()`. A boolean variable determines if output is sent to the console.
+* `utils.js` - `adaptColor()`, used for automatically adjusting the text color based on the background color. 
 
+# Future
 
+Here's a list of things I'd like to investigate and possibly implement : 
 
-
-
+* Increase quantity of gauge panels. And place all of them into a carousel or some other type of container. It would have to work for mobile and desktop browsers.
+* Receive gauge info from the server via Socket.io during application start-up. This would include - 
+    * Name
+    * Data Channel
+    * *TBD*
+* Rework the gauge element IDs. 
+* Make the gauge panels *dynamic*, like the weather widgets and table they will not exist until rendered at application start-up.
+* Gauge visual enhancements : 
+    * Implement *trend* indicators, these will show whether the current value is "up" or "down" from the last value.
+    * Increase the number of value ranges for both types of gauge.
+* Add a panel to show current thermostat state. *This will require modifications to the server*
+* Historical sensor data graphs.
+* Historical weather data, saved on the server and recalled by the application.
 
 <br>
 <hr>
