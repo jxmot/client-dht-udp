@@ -54,7 +54,7 @@ After investigating a number of options I decided that *<a href="https://c3js.or
 ## Application UI Layout
 
 <p align="center">
-  <img src="./mdimg/sensornet-sshot1-1060x700.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
+  <img src="./mdimg/sensornet-sshot1-530x350.png" style="width:65%"; alt="SensorNet Screen Shot #1" txt="SensorNet Screen Shot #1"/>
 </p>
 
 The page consists of four sensor *panels*, and three *collapsible panels*. It is responsive and viewable even on smaller mobile screens.
