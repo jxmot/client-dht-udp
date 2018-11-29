@@ -2,7 +2,6 @@
 
 This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-udp)** server, and displays temperature and humidity using gauges. It also displays current weather condition and forecast data from a *selectable* weather data source.
 
-
 - [History](#history)
 - [Overview](#overview)
   * [Technologies Used](#technologies-used)
@@ -14,19 +13,23 @@ This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-ud
   * [Application Start Up](#application-start-up)
   * [Gauges](#gauges)
     + [Configuration](#configuration)
+      - [Gauge Configuration Components](#gauge-configuration-components)
+    + [Gauge HTML Elements](#gauge-html-elements)
     + [Initialization](#initialization)
   * [Connecting to the SensorNet Server](#connecting-to-the-sensornet-server)
     + [Configuration](#configuration-1)
-    + [Status and Data Reception](#status-and-data-reception)
+  * [Status and Data Reception](#status-and-data-reception)
   * [Sensor Status](#sensor-status)
   * [Sensor Data](#sensor-data)
+  * [Data Purge Status](#data-purge-status)
   * [Weather Data Retrieval](#weather-data-retrieval)
     + [Configuration](#configuration-2)
     + [Service Selection](#service-selection)
       - [Switching Between Services](#switching-between-services)
+- [Extras](#extras)
+- [Future](#future)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
 
 # History
 
@@ -163,6 +166,13 @@ var gauge_cfg = [
 
 Please note that there is some duplication of fields between paired gauges(*temperature & humidity*). And at this time the duplication is intentional. The purpose was to insure that *each* gauge was independent of the others and could have its own text elements assigned to it.
 
+#### Gauge Configuration Components
+
+
+
+
+### Gauge HTML Elements
+
 And here's the associated HTML : 
 
 ```html
@@ -289,12 +299,6 @@ Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match yo
     socket.on('wxfcst', showWXFcast);
 ```
 
-
-
-
-
-
-
 ## Sensor Status
 
 ## Sensor Data
@@ -357,14 +361,14 @@ Here's a list of things I'd like to investigate and possibly implement :
     * Name
     * Data Channel
     * *TBD*
-* Rework the gauge element IDs. 
 * Make the gauge panels *dynamic*, like the weather widgets and table they will not exist until rendered at application start-up.
-* Gauge visual enhancements : 
+* Rework the gauge element IDs. This will follow "Make the gauge panels *dynamic*".
+* * Gauge visual enhancements : 
     * Implement *trend* indicators, these will show whether the current value is "up" or "down" from the last value.
     * Increase the number of value ranges for both types of gauge.
 * Add a panel to show current thermostat state. *This will require modifications to the server*
 * Historical sensor data graphs.
-* Historical weather data, saved on the server and recalled by the application.
+* Historical weather data, saved on the server and recalled by the application. 
 
 <br>
 <hr>
