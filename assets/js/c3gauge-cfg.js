@@ -8,10 +8,10 @@ const _c3_enable = function() {
     // this is how we get access to the gauge's config data
     const thisGauge = this;
     // set the device label now
-    document.getElementById(this.device).innerHTML = this.data_channel;
+    document.getElementById(thisGauge.device).innerHTML = thisGauge.data_channel;
     // wait for incoming messages...
     // NOTE: data_channel is known as "dev_id" in the data
-    $(document).on(this.data_channel, function(e, sdata) {
+    $(document).on(thisGauge.data_channel, function(e, sdata) {
         consolelog(thisGauge.name + '  ' + thisGauge.type);
         consolelog('got data - ' + JSON.stringify(sdata));
         // all messages have a time stamp
