@@ -1,5 +1,7 @@
 # client-dht-udp
 
+**This document is a work-in-progress. Please disregard this document until this message is removed.**
+
 This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-udp)** server, and displays temperature and humidity using gauges. It also displays current weather condition and forecast data from a *selectable* weather data source.
 
 - [History](#history)
@@ -13,7 +15,8 @@ This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-ud
   * [Application Start Up](#application-start-up)
   * [Gauges](#gauges)
     + [Configuration](#configuration)
-      - [Gauge Configuration Components](#gauge-configuration-components)
+    + [Gauge Configuration Components](#gauge-configuration-components)
+      - [Configuration Subcomponents](#configuration-subcomponents)
     + [Gauge HTML Elements](#gauge-html-elements)
     + [Initialization](#initialization)
   * [Connecting to the SensorNet Server](#connecting-to-the-sensornet-server)
@@ -22,14 +25,14 @@ This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-ud
   * [Sensor Status](#sensor-status)
   * [Sensor Data](#sensor-data)
   * [Data Purge Status](#data-purge-status)
-  * [Weather Data Retrieval](#weather-data-retrieval)
-    + [Configuration](#configuration-2)
+  * [Weather Data Reception](#weather-data-reception)
     + [Service Selection](#service-selection)
       - [Switching Between Services](#switching-between-services)
 - [Extras](#extras)
 - [Future](#future)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 # History
 
@@ -166,9 +169,73 @@ var gauge_cfg = [
 
 Please note that there is some duplication of fields between paired gauges(*temperature & humidity*). And at this time the duplication is intentional. The purpose was to insure that *each* gauge was independent of the others and could have its own text elements assigned to it.
 
-#### Gauge Configuration Components
+### Gauge Configuration Components
 
+Each gauge configuration consists of the following components :
 
+**Gauge Information :**
+
+```javascript
+data_channel: 'ESP_49F542',
+name: 'Den',
+target: 'gaugediv_1',
+```
+
+* `data_channel` - This links the gauge to a specific sensor. 
+* `name` - This is the displayed name for the sensor.
+* `target` - The `<div>` where the gauge will be contained.
+
+**Gauge Type & Unit of Measure :**
+
+This 
+
+```javascript
+type: t_gauge.type,
+unit: t_gauge.unit,
+```
+
+* `type` - Contains `'T'` or `'H'` to indicate temperature or humidity.
+* `unit` - Contains `'°F'` or `'°C'` to indicate Fahrenheit or centigrade.
+
+The `t_gauge` object is the container for those options, and is reused in all temperature gauges.
+
+**Sensor Data Display Elements :**
+
+```javascript
+label: 'gaugelab_1',
+device: 'gauge_device_1',
+info: 'gauge_update_1',
+status: 'gauge_status_1',
+```
+
+* `label` - 
+* `device` - 
+* `info` - 
+* `status` - 
+
+**Sensor Data Adjustments :**
+
+```javascript
+round: false,
+```
+
+* `round` - 
+
+**Gauge Configuration for C3.js :**
+
+```javascript
+opt: _c3_humi_gauge.opt,
+chart: {},
+data: {},
+enable: _c3_enable
+```
+
+* `opt` - 
+* `chart` - 
+* `data` - 
+* `enable` - 
+
+#### Configuration Subcomponents
 
 
 ### Gauge HTML Elements
@@ -305,22 +372,32 @@ Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match yo
 
 ## Data Purge Status
 
-## Weather Data Retrieval
+## Weather Data Reception
 
-### Configuration
+The SensorNet server is responsible for collecting and distributing the weather data to all connected clients. This approach is well suited for reducing the quantity of API requests that are sent to the weather data provider. Please see **[node-dht-udp](https://github.com/jxmot/node-dht-udp)** for detailed information.
 
 ### Service Selection
 
+In the upper-right corner of the weather data panel are some radio buttons. They're used for selecting a weather data service as the provider for the displayed data and icons.
+
+<p align="center">
+  <img src="./mdimg/wxsel-254x97.png" alt="Weather service radio buttons" txt="Weather service radio buttons"/>
+</p>
+
+
+
 #### Switching Between Services
 
+The radio buttons have `data` attributes that contain a *weather service ID* that is sent to the server to select a data provider. 
+
 ```html
-<div id="wxsvc-picker" class="wxsvc-center" data-count=2>
+<div id="wxsvc-picker" class="wxsvc-center">
     <h5>Choose a data source:</h5>
     <div class="radio-inline">
-        <label class="use-pointer"><input class="use-pointer" id="wxsvc_src-1" type="radio" data-wxsvc="noaa-v3" name="optradio">NOAA</label>
+        <label class="use-pointer"><input class="use-pointer" type="radio" data-wxsvc="noaa-v3" name="optradio">NOAA</label>
     </div>
     <div class="radio-inline">
-        <label class="use-pointer"><input class="use-pointer" id="wxsvc_src-2" type="radio" data-wxsvc="owm-v25" name="optradio" checked>OpenWeatherMap</label>
+        <label class="use-pointer"><input class="use-pointer" type="radio" data-wxsvc="owm-v25" name="optradio" checked>OpenWeatherMap</label>
     </div>
 </div>
 ```
@@ -329,22 +406,14 @@ Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match yo
 let wxsvc_selection = '';
 
 (function() {
-    let count = $("#wxsvc-picker").data().count;
-    for(let ix = 1;ix <= count; ix++) {
-        if($('#wxsvc_src-'+ix).prop('checked') === true) {
-            wxsvc_selection = $('#wxsvc_src-'+ix).data().wxsvc;
-            break;
-        }
-    }
-};
-
-$('#wxsvc_src-1').on('change', newWXSvc);
-$('#wxsvc_src-2').on('change', newWXSvc);
-
-function newWXSvc() {
-    wxsvc_selection = this.dataset.wxsvc;
+    wxsvc_selection = $('#wxsvc-picker input[type=radio]:checked').data('wxsvc');
     $(document).trigger('wxsvc_select', [wxsvc_selection]);
 };
+
+$('#wxsvc-picker input[type=radio]').on('change', function() {
+    wxsvc_selection = $(this).data('wxsvc');
+    $(document).trigger('wxsvc_select', [wxsvc_selection]);
+});
 ```
 
 # Extras
