@@ -7,11 +7,9 @@
 
     (c) 2017 Jim Motyl - https://github.com/jxmot/
 */
-const debug = true;
+const debug = false;
 
 function consolelog(text) {
-    if(debug) {
-        console.log(text);
-    }
+    if(debug) console.log(text);
 };
 
