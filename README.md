@@ -182,7 +182,7 @@ target: 'gaugediv_1',
 
 * `data_channel` - This links the gauge to a specific sensor. 
 * `name` - This is the displayed name for the sensor.
-* `target` - The `<div>` where the gauge will be contained.
+* `target` - The ID of the `<div>` where the gauge will be contained.
 
 **Gauge Type & Unit of Measure :**
 
@@ -218,7 +218,7 @@ status: 'gauge_status_1',
 round: false,
 ```
 
-* `round` - 
+* `round` - If true the gauge value will be rounded to the nearest integer value.
 
 **Gauge Configuration for C3.js :**
 
@@ -239,7 +239,7 @@ enable: _c3_enable
 
 ### Gauge HTML Elements
 
-And here's the associated HTML : 
+And here's the associated gauge HTML : 
 
 ```html
 <div class="col-lg-2 col-lg-offset-2 col-md-3 col-sm-6 col-xs-12">
@@ -382,8 +382,6 @@ In the upper-right corner of the weather data panel are some radio buttons. They
 <p align="center">
   <img src="./mdimg/wxsel-254x97.png" alt="Weather service radio buttons" txt="Weather service radio buttons"/>
 </p>
-
-
 
 #### Switching Between Services
 
