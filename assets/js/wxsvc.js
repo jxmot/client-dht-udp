@@ -4,14 +4,8 @@ let MAX_DAY_PERIODS = 24;
 let wxsvc_selection = '';
 
 (function() {
-
-    let count = $("#wxsvc-picker").data().count;
-    for(let ix = 1;ix <= count; ix++) {
-        if($('#wxsvc_src-'+ix).prop('checked') === true) {
-            wxsvc_selection = $('#wxsvc_src-'+ix).data().wxsvc;
-            break;
-        }
-    }
+    wxsvc_selection = $('#wxsvc-picker input[type=radio]:checked').val();
+    $(document).trigger('wxsvc_select', [wxsvc_selection]);
 
     createOWMWidgets();
     createNOAATable();
@@ -206,13 +200,10 @@ function updateOWMFcast(wxdata) {
     }
 };
 
-$('#wxsvc_src-1').on('change', newWXSvc);
-$('#wxsvc_src-2').on('change', newWXSvc);
-
-function newWXSvc() {
-    wxsvc_selection = this.dataset.wxsvc;
+$('#wxsvc-picker input[type=radio]').on('change', function() {
+    wxsvc_selection = $(this).val();
     $(document).trigger('wxsvc_select', [wxsvc_selection]);
-};
+});
 
 /*
     hours for color change - 
