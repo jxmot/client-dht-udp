@@ -154,17 +154,28 @@
                         <div id="wx-collapse" class="panel-collapse collapse">
                             <div class="panel-body wxsvc-content">
                                 <div class="row">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                         <h4 id="wxsvc-loc" class="wxsvc-center">
-                                            <!-- Current Conditions For:<br> -->
                                             <span id="wxsvc_plc"></span> 
                                         </h4>
                                         <h5 id="wxsvc-when" class="wxsvc-center">
-                                            <!-- <span id="wxsvc_gmt"></span> -->
                                         </h5>
-                                        <div class="wxsvc-center wxsvc-svc">
+                                        <div class="wxsvc-center wxsvc-svc-credit">
                                             Data &amp; Icons provided by:&nbsp;
                                             <span id="wxsvc_svc"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div id="wxsvc-picker" class="wxsvc-center">
+                                            <h5>Choose a data source:</h5>
+                                            <div class="radio-inline">
+                                                <label class="use-pointer"><input class="use-pointer" type="radio" value="noaa-v3" name="wxsvc_opt">NOAA</label>
+                                            </div>
+                                            <div class="radio-inline">
+                                                <label class="use-pointer"><input class="use-pointer" type="radio" value="owm-v25" name="wxsvc_opt" checked>OpenWeatherMap</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div> 
@@ -174,21 +185,32 @@
                                     <!-- Currently -->
                                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                         <h5 id="wxsvc-title_cond" class="wxsvc-center">
-                                            Conditions <span id="wxsvc_gmt"></span>
+                                            Conditions On <span id="wxsvc_gmt"></span>
                                         </h5>
                                         <!-- conditions -->
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <h6 id="wxsvc-curr_1">
-                                                    <span id="wxsvc_txt"></span>,
+                                                    <img id="wxsvc_ico" class="icon hidden" src="" alt="">
+                                                    <span id="wxsvc_desc" class="hidden"></span>
+                                                    <span id="wxsvc_comma" class="hidden">,</span>
                                                     <span id="wxsvc_t"></span>&nbsp;°F with 
                                                     <span id="wxsvc_h"></span>&nbsp;%RH
                                                 </h6>
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <div id="wxsvc_tminmax" class="row hidden">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h6 id="wxsvc-curr_2">
+                                                <h6 id="wxsvc-curr_2a">
+                                                    <span>High:&nbsp;<span id="wxsvc_tmax"></span>&nbsp;°F</span>
+                                                    <br>
+                                                    <span>Low:&nbsp;&nbsp;<span id="wxsvc_tmin"></span>&nbsp;°F</span>
+                                                </h6>
+                                            </div>
+                                        </div> 
+                                        <div id="wxsvc_dewhix" class="row hidden">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <h6 id="wxsvc-curr_2b">
                                                     The dew point is <span id="wxsvc_dew"></span>&nbsp;°F 
                                                     <span id="wxsvc_hix_msg">and the heat index is <span id="wxsvc_hix"></span>&nbsp;°F</span>
                                                 </h6>
@@ -199,7 +221,18 @@
                                                 <h6 id="wxsvc-wind">
                                                     Winds are <span id="wxsvc_ws"></span>&nbsp;MPH from the 
                                                     <span id="wxsvc_wd"></span>
-                                                    <span id="wxsvc_wg_msg">and gusting to <span id="wxsvc_wg"></span>&nbsp;MPH.</span>
+                                                    <span id="wxsvc_wg_msg" class="hidden">and gusting to <span id="wxsvc_wg"></span>&nbsp;MPH.</span>
+                                                </h6>
+                                            </div>
+                                        </div> 
+                                        <div id="wxsvc_sun" class="row hidden">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <h6 id="wxsvc-sun">
+                                                    <span class="wxsvc-span-pad">On&nbsp;<span id="wxsvc_sundy"></span></span>
+                                                    <br>
+                                                    <span>Sunrise:&nbsp;<span id="wxsvc_sunup"></span></span>
+                                                    <br>
+                                                    <span>Sunset:&nbsp;&nbsp;<span id="wxsvc_sundn"></span></span>
                                                 </h6>
                                             </div>
                                         </div> 
@@ -208,63 +241,21 @@
                                     <!-- /Currently -->
                                     <!-- Forecast -->
                                     <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                                        <h5 id="wxsvc-title_fore" class="wxsvc-center">
-                                            Forecast <span id="wxfcast_gmt"></span>
-                                        </h5>
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <h5 id="wxsvc-title_fcast" class="wxsvc-center">
+                                                    Forecast On <span id="wxfcast_gmt"></span>
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <!-- forecast widgets -->
+                                                <div id="forecast_widgets" class="wxsvc-widget-list hidden">
+                                                </div>
+                                                <!-- /forecast widgets -->
                                                 <!-- forecast table -->
-                                                <div class="table-responsive">
-                                                    <!-- <table id="wxfcast" class="table"> -->
-                                                    <table id="wxfcast" class="wxfcast-table">
-                                                        <tbody id="wxfcast-body">
-                                                            <!-- wx data is added dynamically -->
-                                                            <tr id="wxfcast-day-row">
-                                                                <td id="slot-0" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
-                                                                    <!-- $('td#slot-0 h5.when').text() -->
-                                                                    <h5 class="when"></h5>
-                                                                    <!-- $('td#slot-0 img.icon')[0].src="https://..." -->
-                                                                    <!-- $('td#slot-0 img.icon')[0].alt="..." -->
-                                                                    <img class="icon" src="" alt="">
-                                                                    <!-- $('td#slot-0 p.text').text() -->
-                                                                    <p class="text">
-                                                                    </p>
-                                                                </td>
-                                                                <td id="slot-2" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
-                                                                    <h5 class="when"></h5>
-                                                                    <img class="icon" src="" alt="">
-                                                                    <p class="text">
-                                                                    </p>
-                                                                </td>
-                                                                <td id="slot-4" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
-                                                                    <h5 class="when"></h5>
-                                                                    <img class="icon" src="" alt="">
-                                                                    <p class="text">
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr id="wxfcast-night-row">
-                                                                <td id="slot-1" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
-                                                                    <h5 class="when"></h5>
-                                                                    <img class="icon" src="" alt="">
-                                                                    <p class="text">
-                                                                    </p>
-                                                                </td>
-                                                                <td id="slot-3" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
-                                                                    <h5 class="when"></h5>
-                                                                    <img class="icon" src="" alt="">
-                                                                    <p class="text">
-                                                                    </p>
-                                                                </td>
-                                                                <td id="slot-5" class="wxsvc-table-cell-center wxsvc-table-cell-vert wxsvc-table-cell-width">
-                                                                    <h5 class="when"></h5>
-                                                                    <img class="icon" src="" alt="">
-                                                                    <p class="text">
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                                <div id="forecast_table" class="table-responsive hidden">
                                                 </div>
                                                 <!-- /forecast table -->
                                             </div>
@@ -412,14 +403,15 @@
         <!-- for sensor data via socket.io -->
     <script type="text/javascript" src="assets/js/_socketcfg.js"></script>
     <script type="text/javascript" src="assets/js/appsockets.js"></script>
+        <!-- for purge status and other message/activity from the server -->
+    <script type="text/javascript" src="assets/js/purgestatus.js"></script>
         <!-- for weather service data via socket.io -->
     <script type="text/javascript" src="assets/js/wxsvc.js"></script>
         <!-- using C3 gauges -->
     <script type="text/javascript" src="assets/js/c3gauges.js"></script>
     <!-- ^Featured Project - SensorNet -->
-    <!-- For navigation and collapsible contents -->
+    <!-- For appearance, navigation and collapsible contents -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!-- ^For navigation and collapsible contents -->
+    <!-- ^For appearance, navigation and collapsible contents -->
 </body>
 </html>
-<!-- render done -->

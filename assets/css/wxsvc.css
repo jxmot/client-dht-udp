@@ -3,10 +3,107 @@
     text-align: center;
 }
 
-.wxsvc-svc {
+.wxsvc-left {
+    text-align: left;
+}
+
+.wxsvc-right {
+    text-align: right;
+}
+
+.wxsvc-svc-credit {
     font-size: .75em;
 }
 
+/* owm forecast 
+*/
+.wxsvc-imgcenter {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wxsvc-three_hour {
+    /* width: 100%; */
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    height: 5%;
+    /* border: 1px solid white; */
+}
+
+.wxsvc-nomargin-bot {
+    margin-bottom: 0px!important;
+}
+
+.wxsvc-nomargin-top {
+    margin-top: 0px!important;
+}
+
+.wxsvc-span-pad {
+    padding-bottom: 1%;
+}
+
+.wxsvc-widget-list {
+    overflow-x: none;
+    overflow-y: auto;
+    height: 300px;
+    background-color: black;
+    border: 1px solid white;
+    border-radius: 5px;
+    /* height: 65%; */
+}
+
+
+.wxsvc-widget-date-row {
+/* only used to select an element */
+}
+
+.wxsvc-widget-sunrise {
+/* sunrise 06 */
+    background-color: #E6AE00;
+    border: 1px solid #E6AE00;
+    border-radius: 15px;
+}
+
+.wxsvc-widget-midday {
+/* midday 09,12,15,*/
+    background-color: #FFE700;
+    border: 1px solid #FFE700;
+    border-radius: 15px;
+}
+
+.wxsvc-widget-sunset {
+/* sunset  18*/
+    background-color: #FD7D01;
+    border: 1px solid #FD7D01;
+    border-radius: 15px;
+}
+
+.wxsvc-widget-night {
+/* night  21*/
+    background-color: #000043;
+    border: 1px solid lightgray;
+    border-radius: 15px;
+}
+
+.wxsvc-widget-midnight {
+/* midnight 00,03 */
+    background-color: #000022;
+    border: 1px solid lightgray;
+    border-radius: 15px;
+}
+
+/* remove the border from this class 
+ when using colored heading backgrounds */
+.wxsvc-widget-row {
+    /* border-bottom:3px solid white!important; */
+    padding-top: 3px;
+}
+
+
+/* noaa forecast table
+*/
 .wxsvc-table-cell-center {
     text-align:center!important;
 }
@@ -35,3 +132,4 @@ table td {
     padding-left: 2.5%;
     padding-right: 2.5%;
 }
+
