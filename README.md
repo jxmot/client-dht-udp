@@ -1,6 +1,6 @@
 # client-dht-udp
 
-**This document is a work-in-progress. Please disregard this document until this message is removed.**
+**This document is a work-in-progress. Please note that this document may not be complete until this message is removed.**
 
 This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-udp)** server, and displays temperature and humidity using gauges. It also displays current weather condition and forecast data from a *selectable* weather data source.
 
