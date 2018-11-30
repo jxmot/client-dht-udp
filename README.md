@@ -55,7 +55,6 @@ After investigating a number of options I decided that *<a href="https://c3js.or
 * HTML/CSS
 * Bootstrap
 * JavaScript/jQuery
-* 
 
 ## Application UI Layout
 
