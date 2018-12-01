@@ -270,7 +270,7 @@ And here's the associated gauge HTML :
 ### Initialization
 
 <p align="center">
-  <img src="./mdimg/gauges_init-flow-1-350x1368.png" style="width:25%;" alt="Client start up" txt="Client start up"/>
+  <img src="./mdimg/gauges_init-flow-1-350x1368.png" style="max-width:25%;" alt="Client start up" txt="Client start up"/>
 </p>
 
 ```javascript
