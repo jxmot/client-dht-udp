@@ -99,7 +99,7 @@ The SensorNet client function is to render sensor status and data for display in
 ## Application Start Up
 
 <p align="center">
-  <img src="./mdimg/appstart-flow-860x497.png" style="width:80%;"alt="Client start up" txt="Client start up"/>
+  <img src="./mdimg/appstart-flow-860x497.png" style="width:80%;" alt="Client start up" txt="Client start up"/>
 </p>
 
 
@@ -270,7 +270,7 @@ And here's the associated gauge HTML :
 ### Initialization
 
 <p align="center">
-  <img src="./mdimg/gauges_init-flow-1-350x1368.png" style="width:20%;" alt="Client start up" txt="Client start up"/>
+  <img src="./mdimg/gauges_init-flow-1-350x1368.png" style="width:25%;" alt="Client start up" txt="Client start up"/>
 </p>
 
 ```javascript
