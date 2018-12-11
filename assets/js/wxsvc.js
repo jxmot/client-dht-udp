@@ -67,12 +67,12 @@ function updateOWMObsv(wxdata) {
     let sundy = sr.toLocaleDateString();
     $('#wxsvc_sundy').text(sundy);
 
-    let sunup = sr.getHours() + ':' + sr.getMinutes();
+    let sunup = sr.getHours() + ':' + (sr.getMinutes() < 10 ? '0' : '') + sr.getMinutes();
     $('#wxsvc_sunup').text(sunup);
 
 // TODO : convert to function
     let ss = new Date(wxdata.ss);
-    let sundn = ss.getHours() + ':' + ss.getMinutes();
+    let sundn = ss.getHours() + ':' + (ss.getMinutes() < 10 ? '0' : '') + ss.getMinutes();
     $('#wxsvc_sundn').text(sundn);
 
     $('#wxsvc_ico').removeClass('hidden');
