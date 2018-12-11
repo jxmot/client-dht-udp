@@ -176,17 +176,15 @@ Each gauge configuration consists of the following components :
 
 ```javascript
 data_channel: 'ESP_49F542',
-name: 'Den',
 target: 'gaugediv_1',
+label: 'gaugelab_1',
 ```
 
 * `data_channel` - This links the gauge to a specific sensor. 
-* `name` - This is the displayed name for the sensor.
 * `target` - The ID of the `<div>` where the gauge will be contained.
+* `label` - The ID of the element where the gauge's value will be displayed.
 
 **Gauge Type & Unit of Measure :**
-
-This 
 
 ```javascript
 type: t_gauge.type,
@@ -194,23 +192,23 @@ unit: t_gauge.unit,
 ```
 
 * `type` - Contains `'T'` or `'H'` to indicate temperature or humidity.
-* `unit` - Contains `'°F'` or `'°C'` to indicate Fahrenheit or centigrade.
+* `unit` - Contains `'°F'` or `'°C'` to indicate Fahrenheit or centigrade. And `%RH` for humidity.
 
 The `t_gauge` object is the container for those options, and is reused in all temperature gauges.
 
 **Sensor Data Display Elements :**
 
 ```javascript
-label: 'gaugelab_1',
+name: 'Den',
 device: 'gauge_device_1',
 info: 'gauge_update_1',
 status: 'gauge_status_1',
 ```
 
-* `label` - 
-* `device` - 
-* `info` - 
-* `status` - 
+* `name` - This is the displayed name for the sensor. It is located in the panel's header.
+* `device` - The ID of an element where a unique identifier for the device is displayed.
+* `info` - The ID of an element where a time stamp of the data's creation is displayed.
+* `status` - The ID of an element where the last device status is displayed.
 
 **Sensor Data Adjustments :**
 
@@ -415,8 +413,8 @@ $('#wxsvc-picker input[type=radio]').on('change', function() {
 
 # Extras
 
-* `consolelog.js` - `consolelog()`, an alternative to `console.log()`. A boolean variable determines if output is sent to the console.
-* `utils.js` - `adaptColor()`, used for automatically adjusting the text color based on the background color. 
+* `consolelog.js` - `consolelog()`, an alternative to `console.log()` but where a boolean variable determines if output is sent to the console.
+* `utils.js` - `adaptColor()`, used for automatically adjusting the text color based on the background color of a specified element. 
 
 # Future
 
