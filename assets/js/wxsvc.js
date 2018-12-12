@@ -30,6 +30,11 @@ function wxsvc_obsv(e, payload) {
 
     let wxdata = JSON.parse(JSON.stringify(payload));
 
+    if(wxdata.format === undefined) {
+        $('#wxsvc-picker').hide();
+        wxsvc_selection = wxdata.format = 'noaa-v3';
+    }
+
     if(wxsvc_selection === wxdata.format) {
         switch(wxdata.format) {
             case 'owm-v25':
@@ -137,6 +142,11 @@ function updateNOAAObsv(wxdata) {
 function wxsvc_fcst(e, payload) {
 
     let wxdata = JSON.parse(JSON.stringify(payload));
+
+    if(wxdata.format === undefined) {
+        $('#wxsvc-picker').hide();
+        wxsvc_selection = wxdata.format = 'noaa-v3';
+    }
 
     if(wxsvc_selection === wxdata.format) {
         switch(wxdata.format) {
