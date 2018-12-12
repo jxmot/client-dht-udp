@@ -129,175 +129,76 @@ var _c3_opt_h = {
         show: false
     }
 };
-// 
+// temperature gauge draw function and options
 var _c3_temp_gauge = {
     draw: _c3_draw,
     opt:  _c3_opt_t
 };
-
+// humidity gauge draw function and options
 var _c3_humi_gauge = {
     draw: _c3_draw,
     opt:  _c3_opt_h
 };
-
-// To Do: obtain the next 2 objects from the
-// server. Done as part of a configuration of
-// the client. Must be checked for performance
-// before committing to live code.
+// temperature gauge type and unit of measure text
 var t_gauge = {
     type: 'T',
     unit: '°F'
 };
-
+// humidity gauge type and unit of measure text
 var h_gauge = {
     type: 'H',
     unit: '%RH',
 };
-
+// the entire temperature gauge
+var gaugetemp = {
+    target: 'gauge_temp',
+    type: t_gauge.type,
+    unit: t_gauge.unit,
+    round: false,
+    opt: _c3_temp_gauge.opt,
+    chart: {},
+    data: {}
+ };
+// the entire humidity gauge
+var gaugehumi = {
+    target: 'gauge_humi',
+    type: h_gauge.type,
+    unit: h_gauge.unit,
+    round: false,
+    opt: _c3_humi_gauge.opt,
+    chart: {},
+    data: {}
+};
 //////////////////////////////////////////////////////////////////////////////
 // the gauges...
 var gauge_cfg = [
-    // 
     {
-        // To Do: obtain the next 2 members from the
-        // server. Done as part of a configuration of
-        // the client. Must be checked for performance
-        // before committing to live code.
-        data_channel: 'ESP_49F542',
-        // or just this one, and the types & units from 
-        // above
+        panel: 'sensor-1',
         name: 'Den',
-
-        target: 'gaugediv_1',
-        type: t_gauge.type,
-        unit: t_gauge.unit,
-        label: 'gaugelab_1',
-        device: 'gauge_device_1',
-        info: 'gauge_update_1',
-        status: 'gauge_status_1',
-        round: false,
-        opt: _c3_temp_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-    // 
-    {
-        target: 'gaugediv_2',
-        name: 'Den',
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-        label: 'gaugelab_2',
-        device: 'gauge_device_1',
-        info: 'gauge_update_1',
-        status: 'gauge_status_1',
-        round: false,
         data_channel: 'ESP_49F542',
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
+        enable: _c3_enable,
+        gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     },
-    // 
     {
-        target: 'gaugediv_3',
-        name: 'MBR',
-        type: t_gauge.type,
-        unit: t_gauge.unit,
-        label: 'gaugelab_3',
-        device: 'gauge_device_2',
-        info: 'gauge_update_2',
-        status: 'gauge_status_2',
-        round: false,
+        panel: 'sensor-2',
+        name: 'Master Bedroom',
         data_channel: 'ESP_49EB40',
-        opt: _c3_temp_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
+        enable: _c3_enable,
+        gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     },
-    // 
     {
-        target: 'gaugediv_4',
-        name: 'MBR',
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-        label: 'gaugelab_4',
-        device: 'gauge_device_2',
-        info: 'gauge_update_2',
-        status: 'gauge_status_2',
-        round: false,
-        data_channel: 'ESP_49EB40',
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-    // 
-    {
-        target: 'gaugediv_5',
-        name: 'LR',
-        type: t_gauge.type,
-        unit: t_gauge.unit,
-        label: 'gaugelab_5',
-        device: 'gauge_device_3',
-        info: 'gauge_update_3',
-        status: 'gauge_status_3',
-        round: false,
+        panel: 'sensor-3',
+        name: 'Living Room',
         data_channel: 'ESP_49ECCD',
-        opt: _c3_temp_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
+        enable: _c3_enable,
+        gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     },
-    // 
     {
-        target: 'gaugediv_6',
-        name: 'LR',
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-        label: 'gaugelab_6',
-        device: 'gauge_device_3',
-        info: 'gauge_update_3',
-        status: 'gauge_status_3',
-        round: false,
-        data_channel: 'ESP_49ECCD',
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-    // 
-    {
-        target: 'gaugediv_7',
+        panel: 'sensor-4',
         name: 'Office',
-        type: t_gauge.type,
-        unit: t_gauge.unit,
-        label: 'gaugelab_7',
-        device: 'gauge_device_4',
-        info: 'gauge_update_4',
-        status: 'gauge_status_4',
-        round: false,
         data_channel: 'ESP_49EC8B',
-        opt: _c3_temp_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-    // 
-    {
-        target: 'gaugediv_8',
-        name: 'Office',
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-        label: 'gaugelab_8',
-        device: 'gauge_device_4',
-        info: 'gauge_update_4',
-        status: 'gauge_status_4',
-        round: false,
-        data_channel: 'ESP_49EC8B',
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
+        enable: _c3_enable,
+        gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     }
 ];
+
