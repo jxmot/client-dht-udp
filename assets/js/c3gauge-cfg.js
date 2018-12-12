@@ -8,7 +8,8 @@ const _c3_enable = function() {
     // this is how we get access to the gauge's config data
     const thisGauge = this;
     // set the device label now
-    document.getElementById(thisGauge.device).innerHTML = thisGauge.data_channel;
+    $('#'+thisGauge.panel+' #gaugeinfo').eq(0).text(thisGauge.data_channel);
+
     // wait for incoming messages...
     // NOTE: data_channel is known as "dev_id" in the data
     $(document).on(thisGauge.data_channel, function(e, sdata) {
@@ -22,21 +23,19 @@ const _c3_enable = function() {
             // status, render and display it...
             var out = infodate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false}) + ' - ' + sdata.status;
             if((sdata.msg !== undefined) && (sdata.msg !== null)) out = out + ' - ' + sdata.msg;
-            document.getElementById(thisGauge.status).innerHTML = out;
+            $('#'+thisGauge.panel+' #gaugeinfo').eq(2).text(out);
         } else {
             if(sdata.seq !== undefined) {
                 // data, render and display...
-                var point = 0;
-                if(thisGauge.type === 'T') {
-                    point = sdata.t;
-                    // since the temperature and humidity arrive in 
-                    // the same data packet then we'll only update 
-                    // this info when we update the temperature
-                    document.getElementById(thisGauge.info).innerHTML = infodate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
-                } else point = sdata.h;
-                if(thisGauge.round) point = Math.round(point);
-                document.getElementById(thisGauge.label).innerHTML = point + ' ' + thisGauge.unit;
-                _c3_draw(thisGauge.chart, point);
+                $('#'+thisGauge.panel+' #gaugeinfo').eq(1).text(infodate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false}));
+
+                let t = (thisGauge.gauges[0].round ? Math.round(sdata.t) : sdata.t);
+                _c3_draw(thisGauge.gauges[0].chart, t);
+                $('#'+thisGauge.panel+' #gaugelabel').eq(0).text(t + ' ' + thisGauge.gauges[0].unit);
+
+                let h = (thisGauge.gauges[1].round ? Math.round(sdata.h) : sdata.h);
+                _c3_draw(thisGauge.gauges[1].chart, h);
+                $('#'+thisGauge.panel+' #gaugelabel').eq(1).text(h + ' ' + thisGauge.gauges[1].unit);
             }
         }
     });
