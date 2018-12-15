@@ -13,7 +13,7 @@ This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-ud
     - [Weather Data](#weather-data)
 - [Design Details](#design-details)
   - [Application Start Up](#application-start-up)
-  - [Gauges ](#gauges-)
+  - [Gauges](#gauges)
     - [Design Philosophy](#design-philosophy)
     - [Configuration](#configuration)
     - [Gauge Configuration Components](#gauge-configuration-components)
@@ -99,7 +99,7 @@ The SensorNet client function is to render sensor status and data for display in
   <img src="./mdimg/appstart-flow-860x497.png" style="width:80%;" alt="Client start up" txt="Client start up"/>
 </p>
 
-## Gauges 
+## Gauges
 
 The gauges in this application are based on the C3.js gauge example found [here](https://c3js.org/samples/chart_gauge.html).
 
@@ -212,7 +212,7 @@ var gaugehumi = {
 ### Panel and Gauge Initialization
 
 <p align="center">
-  <img src="./mdimg/gauges_init-flow-1-350x1368.png" style="width:25%;" alt="Client start up" txt="Client start up"/>
+  <img src="./mdimg/gauges_init-flow-1-181x709.png" style="width:25%;" alt="Client start up" txt="Client start up"/>
 </p>
 
 #### Dynamic Creation
