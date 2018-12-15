@@ -30,11 +30,11 @@ const _c3_enable = function() {
                 $('#'+thisGauge.panel+' #gaugeinfo').eq(1).text(infodate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false}));
 
                 let t = (thisGauge.gauges[0].round ? Math.round(sdata.t) : sdata.t);
-                _c3_draw(thisGauge.gauges[0].chart, t);
+                thisGauge.draw(thisGauge.gauges[0].chart, t);
                 $('#'+thisGauge.panel+' #gaugelabel').eq(0).text(t + ' ' + thisGauge.gauges[0].unit);
 
                 let h = (thisGauge.gauges[1].round ? Math.round(sdata.h) : sdata.h);
-                _c3_draw(thisGauge.gauges[1].chart, h);
+                thisGauge.draw(thisGauge.gauges[1].chart, h);
                 $('#'+thisGauge.panel+' #gaugelabel').eq(1).text(h + ' ' + thisGauge.gauges[1].unit);
             }
         }
@@ -176,6 +176,7 @@ var gauge_cfg = [
         name: 'Den',
         data_channel: 'ESP_49F542',
         enable: _c3_enable,
+        draw: _c3_draw,
         gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     },
     {
@@ -183,6 +184,7 @@ var gauge_cfg = [
         name: 'Master Bedroom',
         data_channel: 'ESP_49EB40',
         enable: _c3_enable,
+        draw: _c3_draw,
         gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     },
     {
@@ -190,6 +192,7 @@ var gauge_cfg = [
         name: 'Living Room',
         data_channel: 'ESP_49ECCD',
         enable: _c3_enable,
+        draw: _c3_draw,
         gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     },
     {
@@ -197,6 +200,7 @@ var gauge_cfg = [
         name: 'Office',
         data_channel: 'ESP_49EC8B',
         enable: _c3_enable,
+        draw: _c3_draw,
         gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     }
 ];
