@@ -6,33 +6,30 @@ This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-ud
 
 - [History](#history)
 - [Overview](#overview)
-  * [Technologies Used](#technologies-used)
-  * [Application UI Layout](#application-ui-layout)
-    + [Sensor Data Display](#sensor-data-display)
-    + [System Status](#system-status)
-    + [Weather Data](#weather-data)
+  - [Technologies Used](#technologies-used)
+  - [Application UI Layout](#application-ui-layout)
+    - [Sensor Data Display](#sensor-data-display)
+    - [System Status](#system-status)
+    - [Weather Data](#weather-data)
 - [Design Details](#design-details)
-  * [Application Start Up](#application-start-up)
-  * [Gauges](#gauges)
-    + [Configuration](#configuration)
-    + [Gauge Configuration Components](#gauge-configuration-components)
-      - [Configuration Subcomponents](#configuration-subcomponents)
-    + [Gauge HTML Elements](#gauge-html-elements)
-    + [Initialization](#initialization)
-  * [Connecting to the SensorNet Server](#connecting-to-the-sensornet-server)
-    + [Configuration](#configuration-1)
-  * [Status and Data Reception](#status-and-data-reception)
-  * [Sensor Status](#sensor-status)
-  * [Sensor Data](#sensor-data)
-  * [Data Purge Status](#data-purge-status)
-  * [Weather Data Reception](#weather-data-reception)
-    + [Service Selection](#service-selection)
+  - [Application Start Up](#application-start-up)
+  - [Gauges ](#gauges-)
+    - [Design Philosophy](#design-philosophy)
+    - [Configuration](#configuration)
+    - [Gauge Configuration Components](#gauge-configuration-components)
+    - [Panel and Gauge Initialization](#panel-and-gauge-initialization)
+      - [Dynamic Creation](#dynamic-creation)
+      - [Panel and Gauge HTML Elements](#panel-and-gauge-html-elements)
+  - [Connecting to the SensorNet Server](#connecting-to-the-sensornet-server)
+    - [Configuration](#configuration)
+  - [Status and Data Reception](#status-and-data-reception)
+  - [Sensor Data and Status](#sensor-data-and-status)
+  - [Data Purge Status](#data-purge-status)
+  - [Weather Data Reception](#weather-data-reception)
+    - [Service Selection](#service-selection)
       - [Switching Between Services](#switching-between-services)
 - [Extras](#extras)
 - [Future](#future)
-
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
 
 # History
 
@@ -102,7 +99,6 @@ The SensorNet client function is to render sensor status and data for display in
   <img src="./mdimg/appstart-flow-860x497.png" style="width:80%;" alt="Client start up" txt="Client start up"/>
 </p>
 
-
 ## Gauges 
 
 The gauges in this application are based on the C3.js gauge example found [here](https://c3js.org/samples/chart_gauge.html).
@@ -113,6 +109,10 @@ There have been many changes made to how the gauges are implemented. In this app
 * gauge-instance specific appearance configuration items - type, range, color bands, caption, etc
 * gauge-instance specific functions and event handlers
 
+### Design Philosophy
+
+
+
 ### Configuration
 
 The gauges are grouped in pairs, one gauge for temperature and the other is humidity. And each gauge is represented as an object within an array. In HTML the pair of gauges reside in a *panel* along with sensor status messages.
@@ -121,52 +121,23 @@ Here's an example of a configuration for two gauges in the same panel :
 
 ```javascript
 var gauge_cfg = [
-    // Temperature Gauge
     {
-        data_channel: 'ESP_49F542',
+        // Panel ID, title, and the data channel for sensor events
+        panel: 'sensor-1',
         name: 'Den',
-        target: 'gaugediv_1',
-
-        type: t_gauge.type,
-        unit: t_gauge.unit,
-
-        label: 'gaugelab_1',
-        device: 'gauge_device_1',
-        info: 'gauge_update_1',
-        status: 'gauge_status_1',
-
-        round: false,
-
-        opt: _c3_temp_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-    // Humidity Gauge
-    {
         data_channel: 'ESP_49F542',
-        name: 'Den',
-        target: 'gaugediv_2',
-
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-
-        label: 'gaugelab_2',
-        device: 'gauge_device_1',
-        info: 'gauge_update_1',
-        status: 'gauge_status_1',
-
-        round: false,
-
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
+        
+        // The function that fills in static content and enables the event listener
+        enable: _c3_enable,
+        
+        // The function that draws the gauge.
+        draw: _c3_draw,
+        
+        // Temperature & Humidity Gauges
+        gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     }
 };
 ```
-
-Please note that there is some duplication of fields between paired gauges(*temperature & humidity*). And at this time the duplication is intentional. The purpose was to insure that *each* gauge was independent of the others and could have its own text elements assigned to it.
 
 ### Gauge Configuration Components
 
@@ -174,102 +145,77 @@ Each gauge configuration consists of the following components :
 
 **Gauge Information :**
 
-```javascript
-data_channel: 'ESP_49F542',
-target: 'gaugediv_1',
-label: 'gaugelab_1',
-```
-
-* `data_channel` - This links the gauge to a specific sensor. 
-* `target` - The ID of the `<div>` where the gauge will be contained.
-* `label` - The ID of the element where the gauge's value will be displayed.
-
-**Gauge Type & Unit of Measure :**
+Here's where the panel and the sensor data channel are configured :
 
 ```javascript
-type: t_gauge.type,
-unit: t_gauge.unit,
-```
-
-* `type` - Contains `'T'` or `'H'` to indicate temperature or humidity.
-* `unit` - Contains `'°F'` or `'°C'` to indicate Fahrenheit or centigrade. And `%RH` for humidity.
-
-The `t_gauge` object is the container for those options, and is reused in all temperature gauges.
-
-**Sensor Data Display Elements :**
-
-```javascript
+panel: 'sensor-1',
 name: 'Den',
-device: 'gauge_device_1',
-info: 'gauge_update_1',
-status: 'gauge_status_1',
+data_channel: 'ESP_49F542'
 ```
 
-* `name` - This is the displayed name for the sensor. It is located in the panel's header.
-* `device` - The ID of an element where a unique identifier for the device is displayed.
-* `info` - The ID of an element where a time stamp of the data's creation is displayed.
-* `status` - The ID of an element where the last device status is displayed.
+* `panel` - The ID of the panel (*Bootstrap*) where the gauges will be contained.
+* `name` - The content for the panel's header.
+* `data_channel` - This links the gauges to a specific sensor. 
 
-**Sensor Data Adjustments :**
+**Gauge Functions :**
 
 ```javascript
-round: false,
+// A function that fills in static content and enables the event listener
+enable: _c3_enable,
+        
+// The function that draws the gauge.
+draw: _c3_draw,
 ```
 
-* `round` - If true the gauge value will be rounded to the nearest integer value.
-
-**Gauge Configuration for C3.js :**
-
-```javascript
-opt: _c3_humi_gauge.opt,
-chart: {},
-data: {},
-enable: _c3_enable
-```
-
-* `opt` - 
-* `chart` - 
-* `data` - 
 * `enable` - 
+* `draw` - 
 
-#### Configuration Subcomponents
+**Gauge Definitions :**
 
-
-### Gauge HTML Elements
-
-And here's the associated gauge HTML : 
-
-```html
-<div class="col-lg-2 col-lg-offset-2 col-md-3 col-sm-6 col-xs-12">
-    <div id="sensor-panel-1" class="panel panel-success">
-        <div class="panel-heading">
-            <h3 id="sensor-panel-title-1" class="panel-title sensor-panel-title">Den</h3>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
-                    <div id="gaugediv_1" class="gauge_inner"></div>
-                    <div id="gaugelab_1" class="gauge_label"></div>
-                </div>
-                <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
-                    <div id="gaugediv_2" class="gauge_inner"></div>
-                    <div id="gaugelab_2" class="gauge_label"></div>
-                </div>
-            </div>
-            <br>
-            <header><h6>Device :</h6> <span id="gauge_device_1"></span></header>
-            <header><h6>Update :</h6> <span id="gauge_update_1"></span></header>
-            <header><h6>Status :</h6> <span id="gauge_status_1"></span></header>
-        </div>
-    </div>
-</div>
+```javascript
+// Temperature & Humidity Gauges
+gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
 ```
 
-### Initialization
+* `gauges[0]` - Definition of a *C3.js* gauge configured as a temperature gauge.
+* `gauges[1]` - Definition of a *C3.js* gauge configured as a humidity gauge.
+
+The `JSON.parse(JSON.stringify())` part is absolutely necessary. It insure that a *deep copy* is made of the gauge definition(*object*) and that there are no references to the original.
+
+Here's how the gauges are put together - 
+
+```javascript
+// the entire temperature gauge
+var gaugetemp = {
+    target: 'gauge_temp',
+    unit: '°F',
+    round: false,
+    opt: _c3_opt_t,
+    chart: {}
+};
+// the entire humidity gauge
+var gaugehumi = {
+    target: 'gauge_humi',
+    unit: '%RH',
+    round: false,
+    opt: _c3_opt_h,
+    chart: {}
+};
+```
+
+* `target` - The element ID where the gauge will be drawn.
+* `unit` - Contains `'°F'` or `'°C'` to indicate Fahrenheit or centigrade. And `'%RH'` for humidity.
+* `round` - If true the gauge value will be rounded to the nearest integer value.
+* `opt` - Gauge options that are *C$.js* specific. 
+* `chart` - Used by the *C3.js* draw function.
+
+### Panel and Gauge Initialization
 
 <p align="center">
-  <img src="./mdimg/gauges_init-flow-1-350x1368.png" style="max-width:25%;" alt="Client start up" txt="Client start up"/>
+  <img src="./mdimg/gauges_init-flow-1-350x1368.png" style="width:25%;" alt="Client start up" txt="Client start up"/>
 </p>
+
+#### Dynamic Creation
 
 ```javascript
 (function() {
@@ -280,15 +226,63 @@ function initGauges() {
     // initialize all gauges...
     for(var ix = 0; ix < gauge_cfg.length; ix++)
     {
-        // attach the gauge to its DOM target
-        gauge_cfg[ix].opt.bindto = document.getElementById(gauge_cfg[ix].target);
-        gauge_cfg[ix].chart = c3.generate(gauge_cfg[ix].opt);
+        $('#sensornet #panel').eq(ix).append(makeSensorPanel(ix));
+
+        // attach the gauges to their DOM target
+        //      temperature
+        gauge_cfg[ix].gauges[0].opt.bindto = $('#' + gauge_cfg[ix].panel + ' #' + gauge_cfg[ix].gauges[0].target)[0];
+        // must put these back into the gauge because the deep 
+        // copy used when it was configured can't copy functions
+        gauge_cfg[ix].gauges[0].opt.data.selection.isselectable = function(d){return false;};
+        gauge_cfg[ix].gauges[0].opt.gauge.label.format = function(value,ratio){return null;};
+        // create the gauge
+        gauge_cfg[ix].gauges[0].chart = c3.generate(gauge_cfg[ix].gauges[0].opt);
+
+        //      humidity
+        gauge_cfg[ix].gauges[1].opt.bindto = $('#' + gauge_cfg[ix].panel + ' #' + gauge_cfg[ix].gauges[1].target)[0];
+        gauge_cfg[ix].gauges[1].opt.data.selection.isselectable = function(d){return false;};
+        gauge_cfg[ix].gauges[1].opt.gauge.label.format = function(value,ratio){return null;};
+        gauge_cfg[ix].gauges[1].chart = c3.generate(gauge_cfg[ix].gauges[1].opt);
+
+        // enable the gauge-pair for sensor data & status events
         gauge_cfg[ix].enable();
     }
     // let the app know we're ready for incoming sensor 
     // status and data
     $(document).trigger('gauges_ready', true);
 };
+```
+
+#### Panel and Gauge HTML Elements
+
+The gauge panels(*Bootstrap*) are *dynamically* created when the page loads. The number of panels is determined by the number of configured gauge panels in `gauge_cfg[]`.
+
+Here's a sample of a panel's HTML : 
+
+```html
+<!-- sensor panel, 2 gauges -->
+<div id="sensor-1" class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title sensor-panel-title">Den</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                <div id="gauge_temp" class="gauge_inner"></div>
+                <div id="gaugelabel" class="gauge_label"></div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-6 col-xs-6 gauge_outer">
+                <div id="gauge_humi" class="gauge_inner"></div>
+                <div id="gaugelabel" class="gauge_label"></div>
+            </div>
+        </div>
+        <br>
+        <header><h6>Device :</h6> <span id="gaugeinfo">ESP_49F542</span></header>
+        <header><h6>Update :</h6> <span id="gaugeinfo"></span></header>
+        <header><h6>Status :</h6> <span id="gaugeinfo"></span></header>
+    </div>
+</div>
+<!-- ^sensor panel, 2 gauges -->
 ```
 
 ## Connecting to the SensorNet Server
@@ -363,9 +357,7 @@ Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match yo
     socket.on('wxfcst', showWXFcast);
 ```
 
-## Sensor Status
-
-## Sensor Data
+## Sensor Data and Status
 
 ## Data Purge Status
 
