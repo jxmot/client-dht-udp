@@ -13,8 +13,7 @@ const _c3_enable = function() {
     // wait for incoming messages...
     // NOTE: data_channel is known as "dev_id" in the data
     $(document).on(thisGauge.data_channel, function(e, sdata) {
-        consolelog(thisGauge.name + '  ' + thisGauge.type);
-        consolelog('got data - ' + JSON.stringify(sdata));
+        consolelog(thisGauge.name + ' got data - ' + JSON.stringify(sdata));
         // all messages have a time stamp
         var infodate = new Date(sdata.tstamp);
         // it's easy to distinguish between a status and a data
@@ -128,45 +127,39 @@ var _c3_opt_h = {
         show: false
     }
 };
-// temperature gauge draw function and options
-var _c3_temp_gauge = {
-    draw: _c3_draw,
-    opt:  _c3_opt_t
-};
-// humidity gauge draw function and options
-var _c3_humi_gauge = {
-    draw: _c3_draw,
-    opt:  _c3_opt_h
-};
-// temperature gauge type and unit of measure text
-var t_gauge = {
-    type: 'T',
-    unit: '°F'
-};
-// humidity gauge type and unit of measure text
-var h_gauge = {
-    type: 'H',
-    unit: '%RH',
-};
-// the entire temperature gauge
+// the entire temperature gauge (requires deep copy)
 var gaugetemp = {
     target: 'gauge_temp',
-    type: t_gauge.type,
-    unit: t_gauge.unit,
+    unit: '°F',
     round: false,
-    opt: _c3_temp_gauge.opt,
-    chart: {},
-    data: {}
+    opt: _c3_opt_t,
+    chart: {}
  };
-// the entire humidity gauge
+// the entire humidity gauge (requires deep copy)
 var gaugehumi = {
     target: 'gauge_humi',
-    type: h_gauge.type,
-    unit: h_gauge.unit,
+    unit: '%RH',
     round: false,
-    opt: _c3_humi_gauge.opt,
-    chart: {},
-    data: {}
+    opt: _c3_opt_h,
+    chart: {}
+};
+// trend indicators for all gauges (does not require deep copy)
+var trend = {
+    dn: 'assets/img/trend_dn-30x45.png',
+    eq: 'assets/img/trend_eq-30x23.png',
+    up: 'assets/img/trend_up-30x45.png',
+    unk:'assets/img/trend_unk-29x46.png',
+    bln:'assets/img/trend_blank-30x45.png',
+    last: '',
+    get: function (curr, idunno = false) {
+            let ret = '';
+
+            if(this.last === '') ret = (idunno ? this.unk : this.bln);
+            else ret = (curr > this.last ? this.up : (curr < this.last ? this.dn : this.eq));
+
+            this.last = curr;
+            return ret;
+        }
 };
 //////////////////////////////////////////////////////////////////////////////
 // the gauges...
