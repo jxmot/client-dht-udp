@@ -8,12 +8,12 @@ const _c3_enable = function() {
     // this is how we get access to the gauge's config data
     const thisGauge = this;
     // set the device label now
-    document.getElementById(thisGauge.device).innerHTML = thisGauge.data_channel;
+    $('#'+thisGauge.panel+' #gaugeinfo').eq(0).text(thisGauge.data_channel);
+
     // wait for incoming messages...
     // NOTE: data_channel is known as "dev_id" in the data
     $(document).on(thisGauge.data_channel, function(e, sdata) {
-        consolelog(thisGauge.name + '  ' + thisGauge.type);
-        consolelog('got data - ' + JSON.stringify(sdata));
+        consolelog(thisGauge.name + ' got data - ' + JSON.stringify(sdata));
         // all messages have a time stamp
         var infodate = new Date(sdata.tstamp);
         // it's easy to distinguish between a status and a data
@@ -22,27 +22,29 @@ const _c3_enable = function() {
             // status, render and display it...
             var out = infodate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false}) + ' - ' + sdata.status;
             if((sdata.msg !== undefined) && (sdata.msg !== null)) out = out + ' - ' + sdata.msg;
-            document.getElementById(thisGauge.status).innerHTML = out;
+            $('#'+thisGauge.panel+' #gaugeinfo').eq(2).text(out);
         } else {
             if(sdata.seq !== undefined) {
                 // data, render and display...
-                var point = 0;
-                if(thisGauge.type === 'T') {
-                    point = sdata.t;
-                    // since the temperature and humidity arrive in 
-                    // the same data packet then we'll only update 
-                    // this info when we update the temperature
-                    document.getElementById(thisGauge.info).innerHTML = infodate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
-                } else point = sdata.h;
-                if(thisGauge.round) point = Math.round(point);
-                document.getElementById(thisGauge.label).innerHTML = point + ' ' + thisGauge.unit;
-                _c3_draw(thisGauge.chart, point);
+                $('#'+thisGauge.panel+' #gaugeinfo').eq(1).text(infodate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false}));
+
+                let t = (thisGauge.gauges[0].round ? Math.round(sdata.t) : sdata.t);
+                thisGauge.draw(thisGauge.gauges[0].chart, t);
+                let last  = '<i class="gauge_label_last">'+thisGauge.trends[0].last+'</i>'; // &nbsp;&nbsp;
+                let trendout = '<br><img class="gauge_label_trend" src="' + thisGauge.trends[0].get(t) + '"/>&nbsp;';
+                $('#'+thisGauge.panel+' #gaugelabel').eq(0).html(t + ' ' + thisGauge.gauges[0].unit + trendout + last);
+
+                let h = (thisGauge.gauges[1].round ? Math.round(sdata.h) : sdata.h);
+                thisGauge.draw(thisGauge.gauges[1].chart, h);
+                last  = '<i class="gauge_label_last">'+thisGauge.trends[1].last+'</i>';
+                trendout = '<br><img class="gauge_label_trend" src="' + thisGauge.trends[1].get(h) + '"/>&nbsp;';
+                $('#'+thisGauge.panel+' #gaugelabel').eq(1).html(h + ' ' + thisGauge.gauges[1].unit + trendout + last);
             }
         }
     });
 };
 // draw the gauge
-const _c3_draw = function (_chart, point) {
+const _c3_draw = function(_chart, point) {
     _chart.load({
         columns: [['data', point]]
     });
@@ -129,175 +131,78 @@ var _c3_opt_h = {
         show: false
     }
 };
-// 
-var _c3_temp_gauge = {
-    draw: _c3_draw,
-    opt:  _c3_opt_t
-};
-
-var _c3_humi_gauge = {
-    draw: _c3_draw,
-    opt:  _c3_opt_h
-};
-
-// To Do: obtain the next 2 objects from the
-// server. Done as part of a configuration of
-// the client. Must be checked for performance
-// before committing to live code.
-var t_gauge = {
-    type: 'T',
-    unit: '°F'
-};
-
-var h_gauge = {
-    type: 'H',
+// the entire temperature gauge (requires deep copy)
+var gaugetemp = {
+    target: 'gauge_temp',
+    unit: '°F',
+    round: false,
+    opt: _c3_opt_t,
+    chart: {}
+ };
+// the entire humidity gauge (requires deep copy)
+var gaugehumi = {
+    target: 'gauge_humi',
     unit: '%RH',
+    round: false,
+    opt: _c3_opt_h,
+    chart: {}
 };
+// trend indicators for all gauges (does not require deep copy)
+var trend = {
+    dn: 'assets/img/trend_dn-30x45.png',
+    eq: 'assets/img/trend_eq-30x23.png',
+    up: 'assets/img/trend_up-30x45.png',
+    unk:'assets/img/trend_unk-29x46.png',
+    bln:'assets/img/trend_blank-30x45.png',
+    last: '',
+    get: function (curr, idunno = false) {
+            let ret = '';
 
+            if(this.last === '') ret = (idunno ? this.unk : this.bln);
+            else ret = (curr > this.last ? this.up : (curr < this.last ? this.dn : this.eq));
+
+            this.last = curr;
+            return ret;
+        }
+};
 //////////////////////////////////////////////////////////////////////////////
 // the gauges...
 var gauge_cfg = [
-    // 
     {
-        // To Do: obtain the next 2 members from the
-        // server. Done as part of a configuration of
-        // the client. Must be checked for performance
-        // before committing to live code.
-        data_channel: 'ESP_49F542',
-        // or just this one, and the types & units from 
-        // above
+        panel: 'sensor-1',
         name: 'Den',
-
-        target: 'gaugediv_1',
-        type: t_gauge.type,
-        unit: t_gauge.unit,
-        label: 'gaugelab_1',
-        device: 'gauge_device_1',
-        info: 'gauge_update_1',
-        status: 'gauge_status_1',
-        round: false,
-        opt: _c3_temp_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-    // 
-    {
-        target: 'gaugediv_2',
-        name: 'Den',
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-        label: 'gaugelab_2',
-        device: 'gauge_device_1',
-        info: 'gauge_update_1',
-        status: 'gauge_status_1',
-        round: false,
         data_channel: 'ESP_49F542',
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
+        trends: [Object.assign({}, trend), Object.assign({}, trend)],
+        enable: _c3_enable,
+        draw: _c3_draw,
+        gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     },
-    // 
     {
-        target: 'gaugediv_3',
-        name: 'MBR',
-        type: t_gauge.type,
-        unit: t_gauge.unit,
-        label: 'gaugelab_3',
-        device: 'gauge_device_2',
-        info: 'gauge_update_2',
-        status: 'gauge_status_2',
-        round: false,
+        panel: 'sensor-2',
+        name: 'Master Bedroom',
         data_channel: 'ESP_49EB40',
-        opt: _c3_temp_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
+        trends: [Object.assign({}, trend), Object.assign({}, trend)],
+        enable: _c3_enable,
+        draw: _c3_draw,
+        gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     },
-    // 
     {
-        target: 'gaugediv_4',
-        name: 'MBR',
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-        label: 'gaugelab_4',
-        device: 'gauge_device_2',
-        info: 'gauge_update_2',
-        status: 'gauge_status_2',
-        round: false,
-        data_channel: 'ESP_49EB40',
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-    // 
-    {
-        target: 'gaugediv_5',
-        name: 'LR',
-        type: t_gauge.type,
-        unit: t_gauge.unit,
-        label: 'gaugelab_5',
-        device: 'gauge_device_3',
-        info: 'gauge_update_3',
-        status: 'gauge_status_3',
-        round: false,
+        panel: 'sensor-3',
+        name: 'Living Room',
         data_channel: 'ESP_49ECCD',
-        opt: _c3_temp_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
+        trends: [Object.assign({}, trend), Object.assign({}, trend)],
+        enable: _c3_enable,
+        draw: _c3_draw,
+        gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     },
-    // 
     {
-        target: 'gaugediv_6',
-        name: 'LR',
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-        label: 'gaugelab_6',
-        device: 'gauge_device_3',
-        info: 'gauge_update_3',
-        status: 'gauge_status_3',
-        round: false,
-        data_channel: 'ESP_49ECCD',
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-    // 
-    {
-        target: 'gaugediv_7',
+        panel: 'sensor-4',
         name: 'Office',
-        type: t_gauge.type,
-        unit: t_gauge.unit,
-        label: 'gaugelab_7',
-        device: 'gauge_device_4',
-        info: 'gauge_update_4',
-        status: 'gauge_status_4',
-        round: false,
         data_channel: 'ESP_49EC8B',
-        opt: _c3_temp_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
-    },
-    // 
-    {
-        target: 'gaugediv_8',
-        name: 'Office',
-        type: h_gauge.type,
-        unit: h_gauge.unit,
-        label: 'gaugelab_8',
-        device: 'gauge_device_4',
-        info: 'gauge_update_4',
-        status: 'gauge_status_4',
-        round: false,
-        data_channel: 'ESP_49EC8B',
-        opt: _c3_humi_gauge.opt,
-        chart: {},
-        data: {},
-        enable: _c3_enable
+        trends: [Object.assign({}, trend), Object.assign({}, trend)],
+        enable: _c3_enable,
+        draw: _c3_draw,
+        gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
     }
 ];
+
