@@ -188,15 +188,12 @@ The following symbols are used -
 **Gauge Functions :**
 
 ```javascript
-// A function that fills in static content and enables the event listener
 enable: _c3_enable,
-        
-// The function that draws the gauge.
 draw: _c3_draw,
 ```
 
-* `enable` - Called for each gauge *pair*, fills in some static fields and starts an event listener w
-* `draw` - 
+* `enable` - Called for each gauge *pair*, fills in some static fields and starts an event listener waiting for sensor data and status events.
+* `draw` - The function that draws the gauge.
 
 **Gauge Definitions :**
 
@@ -236,6 +233,10 @@ var gaugehumi = {
 * `round` - If true the gauge value will be rounded to the nearest integer value.
 * `opt` - Gauge options that are *C3.js* specific. 
 * `chart` - Used by the *C3.js* draw function.
+
+**Deep Copy Issue :**
+
+As noted above *deep copying* was used, however that method cannot copy *functions*. The work around used was to rewrite the functions that were lost via the deep copy of the `_c3_opt_t` and `_c3_opt_h` objects. This can be seen in [Dynamic Creation](#dynamic_creation).
 
 ### Panel and Gauge Initialization
 
