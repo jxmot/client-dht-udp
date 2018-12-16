@@ -20,10 +20,19 @@ function c3_initGauges() {
         // attach the gauges to their DOM target
         //      temperature
         gauge_cfg[ix].gauges[0].opt.bindto = $('#' + gauge_cfg[ix].panel + ' #' + gauge_cfg[ix].gauges[0].target)[0];
+        // must put these back into the gauge because the deep 
+        // copy used when it was configured can't copy functions
+        gauge_cfg[ix].gauges[0].opt.data.selection.isselectable = function(d){return false;};
+        gauge_cfg[ix].gauges[0].opt.gauge.label.format = function(value,ratio){return null;};
+        // create the gauge
         gauge_cfg[ix].gauges[0].chart = c3.generate(gauge_cfg[ix].gauges[0].opt);
+
         //      humidity
         gauge_cfg[ix].gauges[1].opt.bindto = $('#' + gauge_cfg[ix].panel + ' #' + gauge_cfg[ix].gauges[1].target)[0];
+        gauge_cfg[ix].gauges[1].opt.data.selection.isselectable = function(d){return false;};
+        gauge_cfg[ix].gauges[1].opt.gauge.label.format = function(value,ratio){return null;};
         gauge_cfg[ix].gauges[1].chart = c3.generate(gauge_cfg[ix].gauges[1].opt);
+
         // enable the gauge-pair for sensor data & status events
         gauge_cfg[ix].enable();
     }
