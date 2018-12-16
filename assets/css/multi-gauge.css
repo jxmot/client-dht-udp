@@ -47,3 +47,12 @@
     font-weight: bold;
 }
 
+.gauge_label_trend {
+    width: 10px;
+}
+
+.gauge_label_last {
+    font-weight: bold;
+    font-size: x-small;
+}
+
