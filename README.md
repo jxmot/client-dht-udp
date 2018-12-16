@@ -4,9 +4,12 @@
 
 This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-udp)** server, and displays temperature and humidity using gauges. It also displays current weather condition and forecast data from a *selectable* weather data source.
 
+# Table of contents
+
 - [History](#history)
 - [Overview](#overview)
   - [Technologies Used](#technologies-used)
+    - [Gauge Library](#gauge-library)
   - [Application UI Layout](#application-ui-layout)
     - [Sensor Data Display](#sensor-data-display)
     - [System Status](#system-status)
@@ -14,7 +17,6 @@ This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-ud
 - [Design Details](#design-details)
   - [Application Start Up](#application-start-up)
   - [Gauges](#gauges)
-    - [Design Philosophy](#design-philosophy)
     - [Configuration](#configuration)
     - [Gauge Configuration Components](#gauge-configuration-components)
     - [Panel and Gauge Initialization](#panel-and-gauge-initialization)
@@ -23,13 +25,12 @@ This is a web client to my **[node-dht-udp](https://github.com/jxmot/node-dht-ud
   - [Connecting to the SensorNet Server](#connecting-to-the-sensornet-server)
     - [Configuration](#configuration)
   - [Status and Data Reception](#status-and-data-reception)
-  - [Sensor Data and Status](#sensor-data-and-status)
-  - [Data Purge Status](#data-purge-status)
   - [Weather Data Reception](#weather-data-reception)
     - [Service Selection](#service-selection)
       - [Switching Between Services](#switching-between-services)
 - [Extras](#extras)
 - [Future](#future)
+
 
 # History
 
@@ -52,6 +53,10 @@ After investigating a number of options I decided that *<a href="https://c3js.or
 * HTML/CSS
 * Bootstrap
 * JavaScript/jQuery
+
+### Gauge Library
+
+*<a href="https://c3js.org/" target="_blank">C3.js v0.4.18</a>* was used in the creation of the gauges.
 
 ## Application UI Layout
 
@@ -109,10 +114,6 @@ There have been many changes made to how the gauges are implemented. In this app
 * gauge-instance specific appearance configuration items - type, range, color bands, caption, etc
 * gauge-instance specific functions and event handlers
 
-### Design Philosophy
-
-
-
 ### Configuration
 
 The gauges are grouped in pairs, one gauge for temperature and the other is humidity. And each gauge is represented as an object within an array. In HTML the pair of gauges reside in a *panel* along with sensor status messages.
@@ -126,6 +127,9 @@ var gauge_cfg = [
         panel: 'sensor-1',
         name: 'Den',
         data_channel: 'ESP_49F542',
+        
+        // Symbols are used to indicate current vs last reading direction of value
+        trends: [Object.assign({}, trend), Object.assign({}, trend)],
         
         // The function that fills in static content and enables the event listener
         enable: _c3_enable,
@@ -157,6 +161,30 @@ data_channel: 'ESP_49F542'
 * `name` - The content for the panel's header.
 * `data_channel` - This links the gauges to a specific sensor. 
 
+**Data Trend Indicator :**
+
+*Trend indicators* show the direction the current reading has taken from the previous.
+
+```javascript
+trends: [Object.assign({}, trend), Object.assign({}, trend)],
+```
+
+After a second sensor reading has been received the trend indicators will appear - 
+
+<p align="center">
+  <img src="./mdimg/sensornet-trend-single-246x460.png" alt="Single gauge with trend indicators" txt="Single gauge with trend indicators"/>
+</p>
+
+The following symbols are used - 
+
+<p align="center">
+  <img src="./mdimg/trend_all_ind-300x118.png" style="width:15%"; alt="Trend inciator examples" txt="Trend inciator examples"/>
+</p>
+
+* Down Arrow - the current reading is lower than the last
+* Up Arrow - the current reading is higher than the last
+* Equal - the current and last reading are equal
+
 **Gauge Functions :**
 
 ```javascript
@@ -167,7 +195,7 @@ enable: _c3_enable,
 draw: _c3_draw,
 ```
 
-* `enable` - 
+* `enable` - Called for each gauge *pair*, fills in some static fields and starts an event listener w
 * `draw` - 
 
 **Gauge Definitions :**
@@ -206,7 +234,7 @@ var gaugehumi = {
 * `target` - The element ID where the gauge will be drawn.
 * `unit` - Contains `'°F'` or `'°C'` to indicate Fahrenheit or centigrade. And `'%RH'` for humidity.
 * `round` - If true the gauge value will be rounded to the nearest integer value.
-* `opt` - Gauge options that are *C$.js* specific. 
+* `opt` - Gauge options that are *C3.js* specific. 
 * `chart` - Used by the *C3.js* draw function.
 
 ### Panel and Gauge Initialization
@@ -357,10 +385,6 @@ Make a copy of the file and save it as `_socketcfg.js`. Then edit it to match yo
     socket.on('wxfcst', showWXFcast);
 ```
 
-## Sensor Data and Status
-
-## Data Purge Status
-
 ## Weather Data Reception
 
 The SensorNet server is responsible for collecting and distributing the weather data to all connected clients. This approach is well suited for reducing the quantity of API requests that are sent to the weather data provider. Please see **[node-dht-udp](https://github.com/jxmot/node-dht-udp)** for detailed information.
@@ -417,10 +441,7 @@ Here's a list of things I'd like to investigate and possibly implement :
     * Name
     * Data Channel
     * *TBD*
-* Make the gauge panels *dynamic*, like the weather widgets and table they will not exist until rendered at application start-up.
-* Rework the gauge element IDs. This will follow "Make the gauge panels *dynamic*".
-* * Gauge visual enhancements : 
-    * Implement *trend* indicators, these will show whether the current value is "up" or "down" from the last value.
+* Gauge visual enhancements : 
     * Increase the number of value ranges for both types of gauge.
 * Add a panel to show current thermostat state. *This will require modifications to the server*
 * Historical sensor data graphs.
