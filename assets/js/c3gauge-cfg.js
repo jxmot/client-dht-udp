@@ -30,17 +30,21 @@ const _c3_enable = function() {
 
                 let t = (thisGauge.gauges[0].round ? Math.round(sdata.t) : sdata.t);
                 thisGauge.draw(thisGauge.gauges[0].chart, t);
-                $('#'+thisGauge.panel+' #gaugelabel').eq(0).text(t + ' ' + thisGauge.gauges[0].unit);
+                let last  = '<i class="gauge_label_last">'+thisGauge.trends[0].last+'</i>'; // &nbsp;&nbsp;
+                let trendout = '<br><img class="gauge_label_trend" src="' + thisGauge.trends[0].get(t) + '"/>&nbsp;';
+                $('#'+thisGauge.panel+' #gaugelabel').eq(0).html(t + ' ' + thisGauge.gauges[0].unit + trendout + last);
 
                 let h = (thisGauge.gauges[1].round ? Math.round(sdata.h) : sdata.h);
                 thisGauge.draw(thisGauge.gauges[1].chart, h);
-                $('#'+thisGauge.panel+' #gaugelabel').eq(1).text(h + ' ' + thisGauge.gauges[1].unit);
+                last  = '<i class="gauge_label_last">'+thisGauge.trends[1].last+'</i>';
+                trendout = '<br><img class="gauge_label_trend" src="' + thisGauge.trends[1].get(h) + '"/>&nbsp;';
+                $('#'+thisGauge.panel+' #gaugelabel').eq(1).html(h + ' ' + thisGauge.gauges[1].unit + trendout + last);
             }
         }
     });
 };
 // draw the gauge
-const _c3_draw = function (_chart, point) {
+const _c3_draw = function(_chart, point) {
     _chart.load({
         columns: [['data', point]]
     });
