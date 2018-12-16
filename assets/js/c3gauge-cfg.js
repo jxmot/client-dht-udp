@@ -168,6 +168,7 @@ var gauge_cfg = [
         panel: 'sensor-1',
         name: 'Den',
         data_channel: 'ESP_49F542',
+        trends: [Object.assign({}, trend), Object.assign({}, trend)],
         enable: _c3_enable,
         draw: _c3_draw,
         gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
@@ -176,6 +177,7 @@ var gauge_cfg = [
         panel: 'sensor-2',
         name: 'Master Bedroom',
         data_channel: 'ESP_49EB40',
+        trends: [Object.assign({}, trend), Object.assign({}, trend)],
         enable: _c3_enable,
         draw: _c3_draw,
         gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
@@ -184,6 +186,7 @@ var gauge_cfg = [
         panel: 'sensor-3',
         name: 'Living Room',
         data_channel: 'ESP_49ECCD',
+        trends: [Object.assign({}, trend), Object.assign({}, trend)],
         enable: _c3_enable,
         draw: _c3_draw,
         gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
@@ -192,6 +195,7 @@ var gauge_cfg = [
         panel: 'sensor-4',
         name: 'Office',
         data_channel: 'ESP_49EC8B',
+        trends: [Object.assign({}, trend), Object.assign({}, trend)],
         enable: _c3_enable,
         draw: _c3_draw,
         gauges: [JSON.parse(JSON.stringify(gaugetemp)), JSON.parse(JSON.stringify(gaugehumi))]
