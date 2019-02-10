@@ -180,8 +180,8 @@ The following symbols are used -
 </p>
 
 * Down Arrow - the current reading is lower than the last
-* Up Arrow - the current reading is higher than the last
 * Equal - the current and last reading are equal
+* Up Arrow - the current reading is higher than the last
 
 **Gauge Functions :**
 
@@ -239,7 +239,7 @@ As noted above *deep copying* was used, however that method cannot copy *functio
 ### Panel and Gauge Initialization
 
 <p align="center">
-  <img src="./mdimg/gauges_init-flow-1-181x709.png" style="width:25%;" alt="Client start up" txt="Client start up"/>
+  <img src="./mdimg/gauges_init-flow-1-181x709.png" style="width:20%;" alt="Client start up" txt="Client start up"/>
 </p>
 
 #### Dynamic Creation
