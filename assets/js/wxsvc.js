@@ -193,7 +193,6 @@ function updateOWMFcast(wxdata) {
         let totime = to[1].split(':');
 
         $('#slot_'+ix+' #wxfcast_date')[0].innerText  = fc[0] + ', ' + dayOfWeek(fcdate);
-//        $('#slot_'+ix+' #wxfcast_date')[0].innerText  = '['+ix+']-' + fc[0] + ', ' + dayOfWeek(fcdate);
         $('#slot_'+ix+' #wxfcast_time')[0].innerText  = time[0] + ':' + time[1] + ' to ' + totime[0] + ':' + totime[1];
 
         setOWMFcastHeader(ix, time[0]);
@@ -262,6 +261,9 @@ let hdrclass = '';
     applyHdrClass(ix, hdrclass);
 };
 
+/*
+    Clear/remove all content from a specified slot
+*/
 function clearOWMFcast(ix) {
     $('#slot_'+ix+' #wxfcast_date')[0].innerText  = '';
     $('#slot_'+ix+' #wxfcast_time')[0].innerText  = '';
