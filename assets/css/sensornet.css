@@ -151,6 +151,10 @@
     font-style:italic;
 }
 
+.sensornet-overview-collink {
+    text-align: center;
+}
+
 .topagetop:link {
     text-decoration: none;
 }
