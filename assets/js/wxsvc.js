@@ -215,37 +215,60 @@ $('#wxsvc-picker input[type=radio]').on('change', function() {
 });
 
 /*
-    hours for color change - 
-    sunrise 06
-    midday 09,12,15
-    sunset  18
-    night  21
-    midnight 00,03
+    The OWM forecast data is seprated into 3 hour segments
+    with 8 segments per day. When we display each segment 
+    the title(date, and time range) will have a background
+    color that is indicative of its time of day. Such as,
+    morning, midday, night, etc.
+
+    
 */
 
 let HDRCLASS = 0;
 let HOURS = 1;
 
+// TODO: Create seasonal variations
+/*
+    Here is the table of CSS classes(wxsvc.css) and an hour
+    value(as text). The table is iterated and when a matching
+    hour is found that corresponding CSS class will be applied
+    to the container.
+*/
 let dayperiods = [
-    ['wxsvc-widget-sunrise',  '06'],
-    ['wxsvc-widget-midday',   '09,12,15'],
-    ['wxsvc-widget-sunset',   '18'],
-    ['wxsvc-widget-night',    '21'],
-    ['wxsvc-widget-midnight', '00,03']
+    ['wxsvc-widget-midnight', ['01']],
+    ['wxsvc-widget-sunrise',  ['04']],
+    ['wxsvc-widget-morning',  ['07']],
+    ['wxsvc-widget-midday',   ['10','13']],
+    ['wxsvc-widget-aftnoon',  ['16']],
+    ['wxsvc-widget-sunset',   ['19']],
+    ['wxsvc-widget-night',    ['22']]
 ];
 
+/*
+    Clear the dayperiod CSS class from a specified slot, 
+    this will iterate through the dayperiod array and
+    attempt to remove the class.
+*/
 function clearHdrClass(ix) {
     for(let hx = 0; hx < dayperiods.length; hx++) {
         $('#slot_'+ix+' div.wxsvc-widget-date-row').removeClass(dayperiods[hx][HDRCLASS]);
     }
 };
 
+/*
+    Add a dayperiod class to a specified slot, and adjust
+    the text color(dark or light) so that it is visible.
+*/
 function applyHdrClass(ix, hdrclass) {
     $('#slot_'+ix+' div.wxsvc-widget-date-row').addClass(hdrclass);
     adaptColor('#slot_'+ix+' div.wxsvc-widget-date-row h5','#slot_'+ix+' div.wxsvc-widget-date-row');
     $('#slot_'+ix).removeClass('hidden');
 };
 
+/*
+    For a specified slot clear the dayperiod class, then
+    find the appropriate one and apply it to the slot.
+*/
 function setOWMFcastHeader(ix, hour) {
 let hdrclass = '';
 
