@@ -1,0 +1,70 @@
+/*
+    OWM forecast slot widget styling
+*/
+.wxsvc-widget-list {
+    overflow-x: none;
+    overflow-y: auto;
+    height: 300px;
+    background-color: black;
+    border: 1px solid white;
+    border-radius: 5px;
+
+    --sunrise-color: #E6AE00;
+    --morning-color: #E5CF00;
+    --midday-color: #FFE700;
+    --aftnoon-color: #E5CF00;
+    --sunset-color: #FD7D01;
+    --night-color: #000043;
+    --midnight-color: #000022;
+}
+
+.wxsvc-widget-date-row {
+/* only used to select an element */
+}
+
+.wxsvc-widget-sunrise {
+    background-color: var(--sunrise-color);
+    border: 1px solid var(--sunrise-color);
+    border-radius: 15px;
+}
+
+.wxsvc-widget-morning {
+    background-color: var(--morning-color);
+    border: 1px solid var(--morning-color);
+    border-radius: 15px;
+}
+
+.wxsvc-widget-midday {
+    background-color: var(--midday-color);
+    border: 1px solid var(--midday-color);
+    border-radius: 15px;
+}
+
+.wxsvc-widget-aftnoon {
+    background-color: var(--aftnoon-color);
+    border: 1px solid var(--aftnoon-color);
+    border-radius: 15px;
+}
+
+.wxsvc-widget-sunset {
+    background-color: var(--sunset-color);
+    border: 1px solid var(--sunset-color);
+    border-radius: 15px;
+}
+
+.wxsvc-widget-night {
+    background-color: var(--night-color);
+    border: 1px solid lightgray;
+    border-radius: 15px;
+}
+
+.wxsvc-widget-midnight {
+    background-color: var(--midnight-color);
+    border: 1px solid lightgray;
+    border-radius: 15px;
+}
+
+.wxsvc-widget-row {
+    padding-top: 3px;
+}
+
