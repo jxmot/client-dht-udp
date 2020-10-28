@@ -16,18 +16,18 @@ const _c3_enable = function() {
         consolelog(thisGauge.name + ' got data - ' + JSON.stringify(sdata));
         // all messages have a time stamp
         var infodate = new Date(sdata.tstamp);
+        var out = infodate.toLocaleString('en-US', {hourCycle:'h23', timeZone:'America/Chicago'});
         // it's easy to distinguish between a status and a data
         // message... use members that are unique to each
         if(sdata.status !== undefined) {
             // status, render and display it...
-            var out = infodate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false}) + ' - ' + sdata.status;
+            out = out + ' - ' + sdata.status;
             if((sdata.msg !== undefined) && (sdata.msg !== null)) out = out + ' - ' + sdata.msg;
             $('#'+thisGauge.panel+' #gaugeinfo').eq(2).text(out);
         } else {
             if(sdata.seq !== undefined) {
                 // data, render and display...
-                $('#'+thisGauge.panel+' #gaugeinfo').eq(1).text(infodate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false}));
-
+                $('#'+thisGauge.panel+' #gaugeinfo').eq(1).text(out);
                 let t = (thisGauge.gauges[0].round ? Math.round(sdata.t) : sdata.t);
                 thisGauge.draw(thisGauge.gauges[0].chart, t);
                 let last  = '<i class="gauge_label_last">'+thisGauge.trends[0].last+'</i>'; // &nbsp;&nbsp;
