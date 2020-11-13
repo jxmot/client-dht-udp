@@ -235,13 +235,13 @@ let HOURS = 1;
     to the container.
 */
 let dayperiods = [
-    ['wxsvc-widget-midnight', ['01']],
-    ['wxsvc-widget-sunrise',  ['04']],
-    ['wxsvc-widget-morning',  ['07']],
-    ['wxsvc-widget-midday',   ['10','13']],
-    ['wxsvc-widget-aftnoon',  ['16']],
-    ['wxsvc-widget-sunset',   ['19']],
-    ['wxsvc-widget-night',    ['22']]
+    ['wxsvc-widget-midnight', ['01','02','03','04']],
+    ['wxsvc-widget-sunrise',  ['05','06','07']],
+    ['wxsvc-widget-morning',  ['08','09','10']],
+    ['wxsvc-widget-midday',   ['11','12','13']],
+    ['wxsvc-widget-aftnoon',  ['14','15','16']],
+    ['wxsvc-widget-sunset',   ['17','18','19','20']],
+    ['wxsvc-widget-night',    ['21','22','23','00']]
 ];
 
 /*
