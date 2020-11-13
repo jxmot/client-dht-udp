@@ -57,7 +57,7 @@ function updateOWMObsv(wxdata) {
     $('#wxsvc_plc').text(wxdata.plc);
 
     let obsdate = new Date(wxdata.gmt);
-    let gmt = obsdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+    let gmt = obsdate.toLocaleString('en-US', {hourCycle:'h23', timeZone:'America/Chicago'});
     gmt = gmt.replace(' ', '');
     let ob = gmt.split(',');
     let time = ob[1].split(':');
@@ -105,7 +105,7 @@ function updateNOAAObsv(wxdata) {
     $('#wxsvc_plc').text(wxdata.plc);
 
     let obsdate = new Date(wxdata.gmt);
-    let gmt = obsdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+    let gmt = obsdate.toLocaleString('en-US', {hourCycle:'h23', timeZone:'America/Chicago'});
     $('#wxsvc_gmt').text(gmt.replace(',', ' @'));
 
     $('#wxsvc_svc').text(wxdata.svc);
@@ -175,7 +175,7 @@ function updateOWMFcast(wxdata) {
     let currFcast = JSON.parse(JSON.stringify(wxdata));
 
     let fcastdate = new Date(currFcast.gmt);
-    let gmt = fcastdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+    let gmt = fcastdate.toLocaleString('en-US', {hourCycle:'h23', timeZone:'America/Chicago'});
     gmt = gmt.replace(' ', '');
     let ob = gmt.split(',');
     let time = ob[1].split(':');
@@ -183,12 +183,12 @@ function updateOWMFcast(wxdata) {
 
     for(let ix = 0; ix < MAX_DAY_PERIODS; ix++) {
         let fcdate = new Date(currFcast.per[ix].dt);
-        let fcdt = fcdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+        let fcdt = fcdate.toLocaleString('en-US', {hourCycle:'h23', timeZone:'America/Chicago'});
         let fc = fcdt.split(', ');
         let time = fc[1].split(':');
 
         let todate = new Date(currFcast.per[ix].dt + (10800 * 1000));
-        let todt = todate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+        let todt = todate.toLocaleString('en-US', {hourCycle:'h23', timeZone:'America/Chicago'});
         let to = todt.split(', ');
         let totime = to[1].split(':');
 
@@ -310,7 +310,7 @@ function clearOWMFcasts() {
 
 function updateNOAAFcast(wxdata) {
     let fcastdate = new Date(wxdata.gmt);
-    let gmt = fcastdate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false});
+    let gmt = fcastdate.toLocaleString('en-US', {hourCycle:'h23', timeZone:'America/Chicago'});
     $('#wxfcast_gmt').text('On ' + gmt.replace(',', ' @'));
     
     for(ix = 0; ix < wxdata.per.length; ix++) {

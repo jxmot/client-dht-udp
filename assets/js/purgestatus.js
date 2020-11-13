@@ -19,7 +19,7 @@ var out = '';
         // for handling older style data w/o the timestamp
         if(payload.tstamp !== undefined) {
             var purgedate = new Date(payload.tstamp);
-            out += ` @ ${purgedate.toLocaleString('en-US', {timeZone:'America/Chicago', hour12:false})}`;
+            out += ` @ ${purgedate.toLocaleString('en-US', {hourCycle:'h23', timeZone:'America/Chicago'})}`;
         }
         document.getElementById(payload.dbtable).innerHTML = out;
     }
