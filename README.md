@@ -451,3 +451,5 @@ Here's a list of things I'd like to investigate and possibly implement :
 <br>
 <p style="text-align:center">(c) 2018 Jim Motyl - https://github.com/jxmot/</p>
 <br>
+---
+<img src="http://webexperiment.info/extcounter/mdcount.php?id=client-dht-udp">
